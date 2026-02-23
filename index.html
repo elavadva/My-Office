@@ -1128,7 +1128,8 @@ function uid(){return DB._id++;}
 
 // ══ HELPERS ══
 function today(){return new Date().toISOString().split('T')[0];}
-function fdate(d){if(!d)return'—';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y}`;}
+function fdate(d){if(!d)return'—';const[y,m,dd]=d.split('-');return`${dd}.${m}.${y}`;}
+function ftime(t){if(!t)return'';return`<span dir="ltr">${t.substring(0,5)}</span>`;}
 function clientName(id){const c=DB.clients.find(x=>x.id==id);return c?c.name:'—';}
 function caseName(id){const c=DB.cases.find(x=>x.id==id);return c?c.name:'—';}
 function initials(name){if(!name)return'?';const p=name.trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
@@ -1474,7 +1475,7 @@ function renderCaseHearings(c) {
       </div>
       <div class="cev-info">
         <div class="cev-title">${escHtml(h.title)}</div>
-        <div class="cev-sub">${h.time?h.time+' · ':''}${h.loc?h.loc+' · ':''}${h.judge?'כב׳ '+escHtml(h.judge):''}${h.notes?`<br><span style="color:var(--text3)">${escHtml(h.notes)}</span>`:''}</div>
+        <div class="cev-sub">${h.time?ftime(h.time)+' · ':''}${h.loc?h.loc+' · ':''}${h.judge?'כב׳ '+escHtml(h.judge):''}${h.notes?`<br><span style="color:var(--text3)">${escHtml(h.notes)}</span>`:''}</div>
       </div>
       <div style="display:flex;gap:4px;flex-shrink:0;">
         <button class="btn btn-ghost btn-xs" onclick="editHearing('${h.id}')">✏️</button>
@@ -1501,7 +1502,7 @@ function renderCaseMeetings(c) {
       </div>
       <div class="cev-info">
         <div class="cev-title">${escHtml(m.title)}</div>
-        <div class="cev-sub">${m.time?m.time:''}${m.endTime?' — '+m.endTime:''}${m.loc?' · '+escHtml(m.loc):''}${m.notes?`<br><span style="color:var(--text3)">${escHtml(m.notes)}</span>`:''}</div>
+        <div class="cev-sub">${m.time?ftime(m.time):''}${m.endTime?' — '+ftime(m.endTime):''}${m.loc?' · '+escHtml(m.loc):''}${m.notes?`<br><span style="color:var(--text3)">${escHtml(m.notes)}</span>`:''}</div>
       </div>
       <div style="display:flex;gap:4px;flex-shrink:0;">
         <button class="btn btn-ghost btn-xs" onclick="editMeeting('${m.id}')">✏️</button>
@@ -1609,6 +1610,19 @@ function saveHearing() {
     DB.events.push({ id: uid(), title: '🏛 ' + title + ' — ' + c.name, date, time: obj.time, endTime: '', caseId: cid, loc: obj.loc, notes: obj.notes || '' });
   }
   dbSave(); closeModal('hearing'); renderCaseProfile(cid);
+  // Ask about billing reminder
+  if (confirm(`האם להוסיף משימת תזכורת לרשום חיוב עבור דיון זה?\n\n"${title}"\n${fdate(date)}`)) {
+    DB.tasks.push({
+      id: uid(),
+      title: `💰 לרשום חיוב — ${title} (${fdate(date)})`,
+      caseId: String(cid),
+      prio: 'high',
+      due: date,
+      notes: `תזכורת לרשום חיוב עבור: ${title}`,
+      done: false
+    });
+    dbSave(); updateBadge(); renderDashboard();
+  }
 }
 
 function deleteHearing() { deleteHearingById(document.getElementById('mh-id').value); closeModal('hearing'); }
@@ -1905,7 +1919,7 @@ function renderCalendar(){
   for(let d=1;d<=days;d++){
     const ds=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const evs=DB.events.filter(e=>e.date===ds);
-    const evHTML=evs.slice(0,3).map(e=>`<div class="cal-evt" onclick="event.stopPropagation();editEvent(${e.id})" title="${e.title}">${e.time?e.time.substring(0,5)+' ':''}${e.title}</div>`).join('');
+    const evHTML=evs.slice(0,3).map(e=>`<div class="cal-evt" onclick="event.stopPropagation();editEvent(${e.id})" title="${e.title}">${e.time?`<span dir="ltr">${e.time.substring(0,5)}</span> `:''} ${e.title}</div>`).join('');
     const more=evs.length>3?`<div style="font-size:10px;color:var(--text3)">+${evs.length-3}</div>`:'';
     grid.innerHTML+=`<div class="cal-day${ds===td?' today':''}" onclick="quickEvent('${ds}')">
       <div class="cal-daynum">${d}</div>${evHTML}${more}
@@ -2063,7 +2077,7 @@ function renderDashboard(){
       </div>
       <div>
         <div style="font-size:13px;font-weight:600;">${e.title}</div>
-        <div style="font-size:11px;color:var(--text3);">${e.time||''}${e.loc?' · '+e.loc:''}${e.caseId?' · '+caseName(e.caseId):''}</div>
+        <div style="font-size:11px;color:var(--text2);">${e.time?`<span dir="ltr">${e.time.substring(0,5)}</span>`:''}${e.loc?' · '+e.loc:''}${e.caseId?' · '+caseName(e.caseId):''}</div>
       </div>
     </div>`).join('')
     :'<div style="color:var(--text3);font-size:13px;padding:16px 0;">אין אירועים קרובים</div>';
