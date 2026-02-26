@@ -2683,7 +2683,10 @@ function applyChargeTemplate() {
   const t = DB.chargeTemplates.find(x => x.id === id);
   if (!t) return;
   document.getElementById('mch-desc').value = t.name;
-  if (t.price) document.getElementById('mch-amount').value = t.price;
+  if (t.price) {
+    document.getElementById('mch-amount').value = t.price;
+    updateVatPreview();
+  }
 }
 
 
