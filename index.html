@@ -16,19 +16,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0d1b2e;
-  --surface: #132240;
-  --surface2: #1a2f52;
-  --border: #1e3a68;
-  --accent: #4a9eff;
-  --accent2: #3b82f6;
-  --text: #e8f0fe;
-  --text2: #93b4d9;
-  --text3: #4a6a9a;
-  --danger: #f87171;
-  --success: #4ade80;
-  --info: #60a5fa;
-  --warn: #fbbf24;
+  --bg: #f2ede4;
+  --surface: #fdf9f3;
+  --surface2: #ebe5d8;
+  --border: #d6cdb8;
+  --accent: #1a3a6e;
+  --accent2: #1e4fa0;
+  --text: #1a1a2e;
+  --text2: #3d4a6b;
+  --text3: #8a8fa8;
+  --danger: #b83040;
+  --success: #1e6e40;
+  --info: #1a4a8a;
+  --warn: #a05010;
   --sidebar-w: 230px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -117,7 +117,7 @@ body{
 /* ─── MOBILE NAV ─── */
 #mob-nav{
   display:none;position:fixed;bottom:0;left:0;right:0;
-  background:#071223;border-top:1px solid var(--border);
+  background:var(--surface);border-top:1px solid var(--border);
   z-index:200;padding-bottom:var(--safe-bottom);
   box-shadow:0 -2px 12px rgba(0,0,0,.06);
 }
@@ -188,7 +188,7 @@ body{
 .sc-warn .stat-value{color:var(--warn);}
 
 /* ─── CARD ─── */
-.card{background:#132240;border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
 .card-title{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 
 /* ─── TABLE ─── */
@@ -370,8 +370,8 @@ select option{background:var(--surface);}
 /* ─── LOG ENTRY ─── */
 .log-entry{
   border-right:3px solid var(--accent);padding:12px 14px;margin-bottom:10px;
-  background:#0d2040;border-radius:0 8px 8px 0;position:relative;
-  border:1px solid var(--border);border-right:3px solid var(--accent2);
+  background:#eef3fc;border-radius:0 8px 8px 0;position:relative;
+  border:1px solid #c8d8f0;border-right:3px solid var(--accent2);
 }
 .log-entry-date{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600;}
 .log-entry-text{font-size:13px;line-height:1.6;white-space:pre-wrap;}
@@ -388,7 +388,7 @@ select option{background:var(--surface);}
 }
 .cev-item:last-child{border-bottom:none;}
 .cev-date-block{
-  background:#0d2040;border:1px solid var(--border);
+  background:var(--surface2);border:1px solid var(--border);
   border-radius:8px;padding:6px 10px;text-align:center;min-width:52px;flex-shrink:0;
 }
 .cev-month{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;}
@@ -535,7 +535,7 @@ select option{background:var(--surface);}
   <!-- ── CLIENTS ── -->
   <div id="view-clients" class="view page-content">
     <div class="action-row">
-      <button class="btn btn-primary" onclick="openModal('client')">+ לקוח חדש</button>
+      <button class="btn btn-primary" onclick="openNewClient()">+ לקוח חדש</button>
     </div>
     <div class="client-grid" id="clients-grid"></div>
   </div>
@@ -676,7 +676,7 @@ select option{background:var(--surface);}
   <!-- ── CASES ── -->
   <div id="view-cases" class="view page-content">
     <div class="action-row">
-      <button class="btn btn-primary" onclick="openModal('case')">+ תיק חדש</button>
+      <button class="btn btn-primary" onclick="openNewCase()">+ תיק חדש</button>
       <select class="filter-select" id="cases-filter" onchange="renderCases()">
         <option value="">כל התיקים</option>
         <option value="active">פעיל</option>
@@ -696,7 +696,7 @@ select option{background:var(--surface);}
   <!-- ── TASKS ── -->
   <div id="view-tasks" class="view page-content">
     <div class="action-row">
-      <button class="btn btn-primary" onclick="openModal('task')">+ משימה חדשה</button>
+      <button class="btn btn-primary" onclick="openNewTask()">+ משימה חדשה</button>
       <select class="filter-select" id="tasks-filter" onchange="renderTasks()">
         <option value="open">פתוחות</option>
         <option value="all">הכל</option>
@@ -721,7 +721,7 @@ select option{background:var(--surface);}
       </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-ghost btn-sm" onclick="exportICS()">📆 ייצוא Apple</button>
-        <button class="btn btn-primary btn-sm" onclick="openModal('event')">+ אירוע</button>
+        <button class="btn btn-primary btn-sm" onclick="openNewEvent()">+ אירוע</button>
       </div>
     </div>
     <div class="card" style="padding:0;overflow:hidden;">
@@ -733,7 +733,7 @@ select option{background:var(--surface);}
   <!-- ── CHARGES ── -->
   <div id="view-charges" class="view page-content">
     <div class="action-row">
-      <button class="btn btn-primary" onclick="openModal('charge')">+ חיוב חדש</button>
+      <button class="btn btn-primary" onclick="openNewCharge()">+ חיוב חדש</button>
       <select class="filter-select" id="charges-filter" onchange="renderCharges()">
         <option value="">כל החיובים</option>
         <option value="unpaid">לא שולם</option>
@@ -962,7 +962,7 @@ select option{background:var(--surface);}
       <div class="form-group"><label>סכום ללא מע״מ (₪) *</label><input id="mch-amount" type="number" placeholder="0" min="0" oninput="updateVatPreview()"></div>
       <div class="form-group"><label>תאריך</label><input id="mch-date" type="date"></div>
     </div>
-    <div id="vat-preview" style="font-size:12px;color:var(--text2);margin:0 0 10px;padding:8px 10px;background:rgba(59,130,246,.1);border-radius:7px;display:none;"></div>
+    <div id="vat-preview" style="font-size:12px;color:var(--text2);margin:0 0 10px;padding:8px 10px;background:rgba(30,79,160,.07);border-radius:7px;display:none;"></div>
     <div class="form-row">
       <div class="form-group">
         <label>סטטוס</label>
@@ -1320,10 +1320,10 @@ document.querySelectorAll('.mni').forEach(el=>{
 function mobileAdd(){
   const map={
     clients:()=>openModal('client'),
-    cases:()=>openModal('case'),
-    tasks:()=>openModal('task'),
-    calendar:()=>openModal('event'),
-    charges:()=>openModal('charge')
+    cases:()=>openNewCase(),
+    tasks:()=>openNewTask(),
+    calendar:()=>openNewEvent(),
+    charges:()=>openNewCharge()
   };
   if(map[currentView])map[currentView]();
 }
@@ -1331,11 +1331,30 @@ function mobileAdd(){
 // ══ MODALS ══
 function openModal(type){
   if(type==='settings'){openModal_settings();return;}
-  if(type==='case'){fillClientSelect('mcs-client');fillCaseTypeSelect();fillReferrerSelect('mcs-referrer');}
+  if(type==='case'){
+    fillClientSelect('mcs-client');
+    fillCaseTypeSelect();
+    // fill referrer select
+    const rsel=document.getElementById('mcs-referrer');
+    if(rsel){
+      const prev=rsel.value;
+      rsel.innerHTML='<option value="">— בחרי גורם מפנה —</option>';
+      (DB.referrers||[]).forEach(r=>rsel.innerHTML+=`<option value="${r}">${r}</option>`);
+      if(prev)rsel.value=prev;
+    }
+  }
   if(type==='task')fillCaseSelect('mt-case');
   if(type==='event')fillCaseSelect('mev-case');
   if(type==='charge'){fillClientSelect('mch-client');fillCaseSelect('mch-case');fillChargeTemplateSelect();}
   document.getElementById('modal-'+type).classList.add('open');
+}
+
+function fillReferrerSelect(selId){
+  const sel=document.getElementById(selId);if(!sel)return;
+  const prev=sel.value;
+  sel.innerHTML='<option value="">— בחרי גורם מפנה —</option>';
+  (DB.referrers||[]).forEach(r=>sel.innerHTML+=`<option value="${r}">${r}</option>`);
+  if(prev)sel.value=prev;
 }
 function closeModal(type){
   document.getElementById('modal-'+type).classList.remove('open');
@@ -1485,7 +1504,7 @@ function renderClients(filter){
       </div>
       <div class="cc-actions">
         <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();editClient(${c.id})">✏️ עריכה</button>
-        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openModal('case')" style="margin-right:auto">+ תיק</button>
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openNewCase()" style="margin-right:auto">+ תיק</button>
         <button class="btn btn-danger-soft btn-xs" onclick="event.stopPropagation();deleteClient(${c.id})">🗑</button>
       </div>
     </div>`;
@@ -2296,7 +2315,157 @@ async function gdriveLoad(){
   }catch(e){gdriveStatus('שגיאת טעינה: '+e.message,'err');}
 }
 
-// ══ INIT ══
+// ══ MISSING FUNCTIONS ══
+
+function openNewCase(){
+  fillClientSelect('mcs-client');
+  fillCaseTypeSelect();
+  fillReferrerSelect('mcs-referrer');
+  document.getElementById('mcs-title').textContent='📁 תיק חדש';
+  document.getElementById('mcs-id').value='';
+  ['mcs-num','mcs-name','mcs-court','mcs-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const cd=document.getElementById('mcs-close-date');if(cd)cd.value='';
+  const ei=document.getElementById('mcs-extra-id');if(ei)ei.value='';
+  document.getElementById('mcs-date').value=today();
+  document.getElementById('mcs-status').value='active';
+  const sr=document.getElementById('subtype-row');if(sr)sr.style.display='none';
+  openModal('case');
+}
+
+function openNewTask(){
+  fillCaseSelect('mt-case');
+  document.getElementById('mt-title').textContent='✅ משימה חדשה';
+  document.getElementById('mt-id').value='';
+  ['mt-title-inp','mt-due','mt-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const mr=document.getElementById('mt-reminder');if(mr)mr.value='';
+  document.getElementById('mt-prio').value='med';
+  openModal('task');
+}
+
+function openNewCharge(){
+  fillClientSelect('mch-client');
+  fillCaseSelect('mch-case');
+  fillChargeTemplateSelect();
+  document.getElementById('mch-title').textContent='💰 חיוב חדש';
+  document.getElementById('mch-id').value='';
+  ['mch-desc','mch-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mch-amount').value='';
+  document.getElementById('mch-date').value=today();
+  document.getElementById('mch-status').value='unpaid';
+  const mt=document.getElementById('mch-template');if(mt)mt.value='';
+  const vp=document.getElementById('vat-preview');if(vp)vp.style.display='none';
+  openModal('charge');
+}
+
+function openNewEvent(){
+  fillCaseSelect('mev-case');
+  document.getElementById('mev-title').textContent='📅 אירוע חדש';
+  document.getElementById('mev-id').value='';
+  ['mev-title-inp','mev-time','mev-endtime','mev-loc','mev-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mev-date').value='';
+  document.getElementById('mev-delete-btn').style.display='none';
+  openModal('event');
+}
+
+function renderReferrersList(){
+  const el=document.getElementById('referrers-list');if(!el)return;
+  el.innerHTML=(DB.referrers||[]).map((r,i)=>`<div style="display:flex;align-items:center;gap:7px;padding:7px 11px;border-bottom:1px solid var(--border);">
+    <span style="flex:1;font-size:13px;">${r}</span>
+    <button class="btn btn-danger-soft btn-xs" onclick="deleteReferrer(${i})">✕</button>
+  </div>`).join('')||'<div style="padding:10px;color:var(--text3);font-size:12px;">אין גורמי הפניה</div>';
+}
+function addReferrer(){
+  const name=document.getElementById('new-referrer-inp').value.trim();if(!name)return;
+  if(!DB.referrers)DB.referrers=[];
+  DB.referrers.push(name);document.getElementById('new-referrer-inp').value='';
+  dbSave();renderReferrersList();
+}
+function deleteReferrer(i){
+  if(!confirm('למחוק?'))return;
+  DB.referrers.splice(i,1);dbSave();renderReferrersList();
+}
+
+function updateVatPreview(){
+  const amt=parseFloat(document.getElementById('mch-amount').value);
+  const el=document.getElementById('vat-preview');if(!el)return;
+  if(isNaN(amt)||amt<=0){el.style.display='none';return;}
+  el.style.display='block';
+  el.innerHTML=`כולל מע״מ (${DB.vatRate||18}%): <strong>₪${withVat(amt).toLocaleString()}</strong>`;
+}
+function saveVatRate(){
+  const v=parseFloat(document.getElementById('vat-rate-inp').value);
+  if(isNaN(v)||v<0||v>100){alert('שיעור מע״מ לא תקין');return;}
+  DB.vatRate=v;dbSave();
+  const vd=document.getElementById('vat-rate-display');if(vd)vd.textContent=`נוכחי: ${v}%`;
+  alert('שיעור המע״מ עודכן ל-'+v+'%');
+}
+
+function openExportTasksModal(){
+  const sel=document.getElementById('exp-client');
+  if(sel){sel.innerHTML='<option value="">כל הלקוחות</option>';DB.clients.forEach(c=>sel.innerHTML+=`<option value="${c.id}">${c.name}</option>`);}
+  const csel=document.getElementById('exp-case');
+  if(csel){csel.innerHTML='<option value="">כל התיקים</option>';DB.cases.forEach(c=>csel.innerHTML+=`<option value="${c.id}">${c.name}</option>`);}
+  ['exp-reminder-from','exp-reminder-to','exp-due-from','exp-due-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const es=document.getElementById('exp-status');if(es)es.value='open';
+  openModal('export-tasks');
+}
+function exportTasksCSV(){
+  const clientId=document.getElementById('exp-client')?.value||'';
+  const caseId=document.getElementById('exp-case')?.value||'';
+  const rFrom=document.getElementById('exp-reminder-from')?.value||'';
+  const rTo=document.getElementById('exp-reminder-to')?.value||'';
+  const dFrom=document.getElementById('exp-due-from')?.value||'';
+  const dTo=document.getElementById('exp-due-to')?.value||'';
+  const status=document.getElementById('exp-status')?.value||'open';
+  let list=[...DB.tasks];
+  if(status==='open')list=list.filter(t=>!t.done);
+  if(status==='done')list=list.filter(t=>t.done);
+  if(clientId){const ids=DB.cases.filter(c=>c.clientId==clientId).map(c=>String(c.id));list=list.filter(t=>ids.includes(String(t.caseId)));}
+  if(caseId)list=list.filter(t=>String(t.caseId)===String(caseId));
+  if(rFrom)list=list.filter(t=>t.reminder&&t.reminder>=rFrom);
+  if(rTo)list=list.filter(t=>t.reminder&&t.reminder<=rTo);
+  if(dFrom)list=list.filter(t=>t.due&&t.due>=dFrom);
+  if(dTo)list=list.filter(t=>t.due&&t.due<=dTo);
+  if(!list.length){alert('לא נמצאו משימות לייצוא');return;}
+  const lines=['"משימה","תיק","תאריך תזכורת","תאריך אחרון לביצוע","עדיפות","סטטוס"'];
+  list.forEach(t=>lines.push(`"${t.title}","${t.caseId?caseName(t.caseId):''}","${fdate(t.reminder)}","${fdate(t.due)}","${t.prio==='high'?'גבוהה':t.prio==='med'?'בינונית':'נמוכה'}","${t.done?'הושלמה':'פתוחה'}"`));
+  const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`משימות-${today()}.csv`;a.click();
+  closeModal('export-tasks');
+}
+
+function initSearch(){
+  const sel=document.getElementById('adv-client');if(!sel)return;
+  sel.innerHTML='<option value="">כל הלקוחות</option>';
+  DB.clients.forEach(c=>sel.innerHTML+=`<option value="${c.id}">${c.name}</option>`);
+}
+function runAdvSearch(){
+  const text=(document.getElementById('adv-text')?.value||'').toLowerCase().trim();
+  const type=document.getElementById('adv-type')?.value||'';
+  const clientId=document.getElementById('adv-client')?.value||'';
+  const status=document.getElementById('adv-status')?.value||'';
+  const from=document.getElementById('adv-from')?.value||'';
+  const to=document.getElementById('adv-to')?.value||'';
+  const results=[];
+  if(!type||type==='client')
+    DB.clients.filter(c=>!text||c.name.toLowerCase().includes(text)||(c.phone||'').includes(text)||(c.email||'').toLowerCase().includes(text))
+    .forEach(c=>results.push({type:'לקוח',title:c.name,sub:c.phone||c.email||'',onclick:`openProfile(${c.id})`}));
+  if(!type||type==='case')
+    DB.cases.filter(c=>(!text||(c.name.toLowerCase().includes(text)||(c.num||'').includes(text)||(c.desc||'').toLowerCase().includes(text)))&&(!clientId||c.clientId==clientId)&&(!status||c.status===status)&&(!from||c.date>=from)&&(!to||c.date<=to))
+    .forEach(c=>results.push({type:'תיק',title:c.name,sub:clientName(c.clientId)+' · '+c.type,onclick:`openCaseProfile(${c.id})`}));
+  if(!type||type==='task')
+    DB.tasks.filter(t=>!text||t.title.toLowerCase().includes(text)||(t.notes||'').toLowerCase().includes(text))
+    .forEach(t=>results.push({type:'משימה',title:t.title,sub:(t.caseId?caseName(t.caseId)+' · ':'')+(t.due?fdate(t.due):''),onclick:`editTask(${t.id})`}));
+  if(!type||type==='charge')
+    DB.charges.filter(ch=>!text||ch.desc.toLowerCase().includes(ch))
+    .forEach(ch=>results.push({type:'חיוב',title:ch.desc,sub:clientName(ch.clientId)+' · ₪'+Number(ch.amount).toLocaleString(),onclick:`editCharge(${ch.id})`}));
+  const el=document.getElementById('adv-results');if(!el)return;
+  if(!results.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">לא נמצאו תוצאות</div></div>';return;}
+  el.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;">${results.map(r=>`<div class="search-result-item" onclick="${r.onclick}"><span class="sri-type">${r.type}</span><div><div class="sri-title">${r.title}</div><div class="sri-sub">${r.sub}</div></div></div>`).join('')}</div>`;
+}
+
+
 dbLoad();
 if (!DB.caseTypes) {
   DB.caseTypes = [
