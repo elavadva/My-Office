@@ -824,7 +824,10 @@ select option{background:var(--surface);}
     <div class="modal-title" id="mc-title">👤 לקוח חדש</div>
     <input type="hidden" id="mc-id">
     <div class="form-row">
-      <div class="form-group"><label>שם מלא *</label><input id="mc-name" placeholder="ישראל ישראלי"></div>
+      <div class="form-group"><label>שם פרטי *</label><input id="mc-firstname" placeholder="ישראל"></div>
+      <div class="form-group"><label>שם משפחה *</label><input id="mc-lastname" placeholder="ישראלי"></div>
+    </div>
+    <div class="form-row">
       <div class="form-group"><label>ת.ז. / ח.פ.</label><input id="mc-idnum" placeholder="000000000"></div>
     </div>
     <div class="form-row">
@@ -1375,8 +1378,10 @@ function updateBadge(){
 
 // ══ CLIENTS ══
 function saveClient(){
-  const name=document.getElementById('mc-name').value.trim();
-  if(!name){alert('שם הלקוח חובה');return;}
+  const firstName=document.getElementById('mc-firstname').value.trim();
+  const lastName=document.getElementById('mc-lastname').value.trim();
+  if(!firstName&&!lastName){alert('יש להזין שם פרטי או שם משפחה');return;}
+  const name=(firstName+' '+lastName).trim();
   const eid=document.getElementById('mc-id').value;
   const obj={
     id:eid||uid(),name,
@@ -1399,7 +1404,9 @@ function editClient(id){
   const c=DB.clients.find(x=>x.id==id);if(!c)return;
   document.getElementById('mc-title').textContent='✏️ עריכת לקוח';
   document.getElementById('mc-id').value=c.id;
-  document.getElementById('mc-name').value=c.name;
+  const nameParts=(c.name||'').trim().split(' ');
+  document.getElementById('mc-firstname').value=nameParts.slice(0,-1).join(' ')||c.name||'';
+  document.getElementById('mc-lastname').value=nameParts.length>1?nameParts[nameParts.length-1]:'';
   document.getElementById('mc-idnum').value=c.idNum||'';
   document.getElementById('mc-phone').value=c.phone||'';
   document.getElementById('mc-email').value=c.email||'';
@@ -2325,7 +2332,7 @@ async function gdriveLoad(){
 function openNewClient(){
   document.getElementById('mc-title').textContent='👤 לקוח חדש';
   document.getElementById('mc-id').value='';
-  ['mc-name','mc-idnum','mc-phone','mc-email','mc-addr','mc-notes'].forEach(id=>{
+  ['mc-firstname','mc-lastname','mc-idnum','mc-phone','mc-email','mc-addr','mc-notes'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
   openModal('client');
