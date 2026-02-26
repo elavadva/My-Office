@@ -699,13 +699,14 @@ select option{background:var(--surface);}
       <button class="btn btn-primary" onclick="openNewTask()">+ משימה חדשה</button>
       <select class="filter-select" id="tasks-filter" onchange="renderTasks()">
         <option value="open">פתוחות</option>
+        <option value="reminder">תזכורת להיום</option>
         <option value="all">הכל</option>
         <option value="done">הושלמו</option>
       </select>
     </div>
     <div class="card">
       <div class="table-wrap"><table>
-        <thead><tr><th>✓</th><th>משימה</th><th>תיק</th><th>תאריך אחרון לביצוע</th><th>עדיפות</th><th>פעולות</th></tr></thead>
+        <thead><tr><th>✓</th><th>משימה</th><th>תיק</th><th>תזכורת</th><th>תאריך אחרון לביצוע</th><th>עדיפות</th><th>פעולות</th></tr></thead>
         <tbody id="tasks-tbody"></tbody>
       </table></div>
     </div>
@@ -789,8 +790,8 @@ select option{background:var(--surface);}
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>מתאריך</label><input id="adv-from" type="date"></div>
-        <div class="form-group"><label>עד תאריך</label><input id="adv-to" type="date"></div>
+        <div class="form-group"><label>מתאריך</label><input id="adv-from" type="date" dir="ltr"></div>
+        <div class="form-group"><label>עד תאריך</label><input id="adv-to" type="date" dir="ltr"></div>
       </div>
       <div style="margin-top:4px;"><button class="btn btn-primary" onclick="runAdvSearch()">🔍 חיפוש</button></div>
     </div>
@@ -876,9 +877,9 @@ select option{background:var(--surface);}
           <option value="urgent">דחוף</option><option value="closed">סגור</option>
         </select>
       </div>
-      <div class="form-group"><label>תאריך פתיחה</label><input id="mcs-date" type="date"></div>
+      <div class="form-group"><label>תאריך פתיחה</label><input id="mcs-date" type="date" dir="ltr"></div>
     </div>
-    <div class="form-row"><div class="form-group"><label>תאריך סגירה</label><input id="mcs-close-date" type="date"></div><div class="form-group"><label>זיהוי נוסף</label><input id="mcs-extra-id" placeholder="מספר תיק בית משפט, ת.פ..."></div></div><div class="form-group form-full"><label>ערכאה / בית משפט</label><input id="mcs-court" placeholder='ביהמ"ש שלום תל אביב'></div>
+    <div class="form-row"><div class="form-group"><label>תאריך סגירה</label><input id="mcs-close-date" type="date" dir="ltr"></div><div class="form-group"><label>זיהוי נוסף</label><input id="mcs-extra-id" placeholder="מספר תיק בית משפט, ת.פ..."></div></div><div class="form-group form-full"><label>ערכאה / בית משפט</label><input id="mcs-court" placeholder='ביהמ"ש שלום תל אביב'></div>
     <div class="form-group form-full"><label>תיאור</label><textarea id="mcs-desc" placeholder="תיאור קצר..."></textarea></div>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="saveCase()">שמירה</button>
@@ -905,7 +906,8 @@ select option{background:var(--surface);}
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>תאריך אחרון לביצוע</label><input id="mt-due" type="date"></div>
+      <div class="form-group"><label>תאריך תזכורת</label><input id="mt-reminder" type="date" dir="ltr"></div>
+      <div class="form-group"><label>תאריך אחרון לביצוע</label><input id="mt-due" type="date" dir="ltr"></div>
     </div>
     <div class="form-group form-full"><label>הערות</label><textarea id="mt-notes" placeholder="פרטים נוספים..."></textarea></div>
     <div class="modal-actions">
@@ -922,11 +924,11 @@ select option{background:var(--surface);}
     <input type="hidden" id="mev-id">
     <div class="form-group"><label>כותרת *</label><input id="mev-title-inp" placeholder="דיון, פגישה, מועד הגשה..."></div>
     <div class="form-row">
-      <div class="form-group"><label>תאריך *</label><input id="mev-date" type="date"></div>
-      <div class="form-group"><label>שעת התחלה</label><input id="mev-time" type="time"></div>
+      <div class="form-group"><label>תאריך *</label><input id="mev-date" type="date" dir="ltr"></div>
+      <div class="form-group"><label>שעת התחלה</label><input id="mev-time" type="time" dir="ltr"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>שעת סיום</label><input id="mev-endtime" type="time"></div>
+      <div class="form-group"><label>שעת סיום</label><input id="mev-endtime" type="time" dir="ltr"></div>
       <div class="form-group"><label>תיק קשור</label><select id="mev-case"><option value="">— ללא —</option></select></div>
     </div>
     <div class="form-group form-full"><label>מיקום</label><input id="mev-loc" placeholder="כתובת / קישור זום"></div>
@@ -960,7 +962,7 @@ select option{background:var(--surface);}
     </div>
     <div class="form-row">
       <div class="form-group"><label>סכום ללא מע״מ (₪) *</label><input id="mch-amount" type="number" placeholder="0" min="0" oninput="updateVatPreview()"></div>
-      <div class="form-group"><label>תאריך</label><input id="mch-date" type="date"></div>
+      <div class="form-group"><label>תאריך</label><input id="mch-date" type="date" dir="ltr"></div>
     </div>
     <div id="vat-preview" style="font-size:12px;color:var(--text2);margin:0 0 10px;padding:8px 10px;background:rgba(30,79,160,.07);border-radius:7px;display:none;"></div>
     <div class="form-row">
@@ -989,8 +991,8 @@ select option{background:var(--surface);}
     <input type="hidden" id="mh-caseid">
     <div class="form-group"><label>תיאור הדיון *</label><input id="mh-title-inp" placeholder='דיון הוכחות, קדם משפט, גזר דין...'></div>
     <div class="form-row">
-      <div class="form-group"><label>תאריך *</label><input id="mh-date" type="date"></div>
-      <div class="form-group"><label>שעה</label><input id="mh-time" type="time"></div>
+      <div class="form-group"><label>תאריך *</label><input id="mh-date" type="date" dir="ltr"></div>
+      <div class="form-group"><label>שעה</label><input id="mh-time" type="time" dir="ltr"></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label>מיקום / אולם</label><input id="mh-loc" placeholder='ביהמ"ש שלום ת"א, אולם 3'></div>
@@ -1017,11 +1019,11 @@ select option{background:var(--surface);}
     <input type="hidden" id="mm-caseid">
     <div class="form-group"><label>נושא הפגישה *</label><input id="mm-title-inp" placeholder="פגישת ייעוץ, הכנה לדיון..."></div>
     <div class="form-row">
-      <div class="form-group"><label>תאריך *</label><input id="mm-date" type="date"></div>
-      <div class="form-group"><label>שעה</label><input id="mm-time" type="time"></div>
+      <div class="form-group"><label>תאריך *</label><input id="mm-date" type="date" dir="ltr"></div>
+      <div class="form-group"><label>שעה</label><input id="mm-time" type="time" dir="ltr"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>שעת סיום</label><input id="mm-endtime" type="time"></div>
+      <div class="form-group"><label>שעת סיום</label><input id="mm-endtime" type="time" dir="ltr"></div>
       <div class="form-group"><label>מיקום</label><input id="mm-loc" placeholder="משרד, זום, טלפון..."></div>
     </div>
     <div class="form-group form-full"><label>הערות</label><textarea id="mm-notes" placeholder="נושאים לדיון, סיכום..."></textarea></div>
@@ -1044,7 +1046,7 @@ select option{background:var(--surface);}
     <input type="hidden" id="ml-id">
     <input type="hidden" id="ml-caseid">
     <div class="form-row">
-      <div class="form-group"><label>תאריך *</label><input id="ml-date" type="date"></div>
+      <div class="form-group"><label>תאריך *</label><input id="ml-date" type="date" dir="ltr"></div>
       <div class="form-group">
         <label>סוג פעולה</label>
         <select id="ml-type">
@@ -1183,12 +1185,12 @@ select option{background:var(--surface);}
       <div class="form-group"><label>תיק</label><select id="exp-case"><option value="">כל התיקים</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>תזכורת מ-</label><input id="exp-reminder-from" type="date"></div>
-      <div class="form-group"><label>תזכורת עד</label><input id="exp-reminder-to" type="date"></div>
+      <div class="form-group"><label>תזכורת מ-</label><input id="exp-reminder-from" type="date" dir="ltr"></div>
+      <div class="form-group"><label>תזכורת עד</label><input id="exp-reminder-to" type="date" dir="ltr"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>תאריך אחרון מ-</label><input id="exp-due-from" type="date"></div>
-      <div class="form-group"><label>תאריך אחרון עד</label><input id="exp-due-to" type="date"></div>
+      <div class="form-group"><label>תאריך אחרון מ-</label><input id="exp-due-from" type="date" dir="ltr"></div>
+      <div class="form-group"><label>תאריך אחרון עד</label><input id="exp-due-to" type="date" dir="ltr"></div>
     </div>
     <div class="form-group"><label>סטטוס</label>
       <select id="exp-status">
@@ -1283,7 +1285,7 @@ const PAGE_TITLES={
 function navTo(view){
   currentView=view;
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+view).classList.add('active');
+  const vEl=document.getElementById('view-'+view);if(!vEl)return;vEl.classList.add('active');
   const[t,s]=PAGE_TITLES[view]||[view,''];
   document.getElementById('dt-title').textContent=t;
   document.getElementById('dt-sub').textContent=s;
@@ -1562,6 +1564,7 @@ function renderCaseProfile(id) {
   ctbody.innerHTML = caseTasks.length ? caseTasks.map(t => `<tr class="${t.done?'task-done':''}">
     <td><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id})" style="accent-color:var(--accent);width:15px;height:15px;"></td>
     <td><strong>${t.title}</strong></td>
+    <td>${t.reminder?`<span style="color:${isOverdue(t.reminder)&&!t.done?'var(--danger)':'var(--text2)'};">${fdate(t.reminder)}</span>`:'—'}</td>
     <td>${t.due?`<span style="color:${isOverdue(t.due)&&!t.done?'var(--danger)':'inherit'}">${fdate(t.due)}</span>`:'—'}</td>
     <td>${prioLabel(t.prio)}</td>
     <td><button class="btn btn-ghost btn-xs" onclick="editTask(${t.id})">✏️</button></td>
@@ -1908,8 +1911,7 @@ function renderCases(){
     <td><strong>${c.num||'—'}</strong></td>
     <td><span class="case-row-link" onclick="openCaseProfile(${c.id})">${c.name}</span></td>
     <td>${clientName(c.clientId)}</td>
-    <td>${c.type}</td>
-    <td>${c.subtype||'—'}</td>
+    <td>${c.type}${c.subtype?`<br><span style="font-size:11px;color:var(--text3)">${c.subtype}</span>`:''}</td>
     <td>${statusTag(c.status)}</td><td>${fdate(c.date)}</td>
     <td><div style="display:flex;gap:6px;">
       <button class="btn btn-ghost btn-xs" onclick="openCaseProfile(${c.id})">📂</button>
@@ -1953,7 +1955,7 @@ function editTask(id){
   document.getElementById('mt-title-inp').value=t.title;
   document.getElementById('mt-case').value=t.caseId||'';
   document.getElementById('mt-prio').value=t.prio;
-  document.getElementById('mt-reminder')?.setAttribute('value',t.reminder||'');
+  const mrEl=document.getElementById('mt-reminder');if(mrEl)mrEl.value=t.reminder||'';
   document.getElementById('mt-due').value=t.due||'';
   document.getElementById('mt-notes').value=t.notes||'';
   document.getElementById('modal-task').classList.add('open');
@@ -1968,8 +1970,10 @@ function deleteTask(id){
 function renderTasks(){
   const filter=document.getElementById('tasks-filter')?.value||'open';
   let list=DB.tasks;
+  const td2=today();
   if(filter==='open')list=list.filter(t=>!t.done);
   if(filter==='done')list=list.filter(t=>t.done);
+  if(filter==='reminder')list=list.filter(t=>!t.done&&t.reminder&&t.reminder<=td2);
   list=[...list].sort((a,b)=>{
     const pv={high:0,med:1,low:2};
     if(pv[a.prio]!==pv[b.prio])return pv[a.prio]-pv[b.prio];
@@ -1978,9 +1982,10 @@ function renderTasks(){
   const tbody=document.getElementById('tasks-tbody');
   if(!list.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">✅</div><div class="empty-text">אין משימות</div></div></td></tr>';return;}
   tbody.innerHTML=list.map(t=>`<tr class="${t.done?'task-done':''}">
-    <td><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id})" style="cursor:pointer;accent-color:var(--accent);width:15px;height:15px;"></td>
+    <td><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id})" style="cursor:pointer;accent-color:var(--accent2);width:15px;height:15px;"></td>
     <td><strong>${t.title}</strong>${t.notes?`<br><span style="font-size:11px;color:var(--text3)">${t.notes}</span>`:''}</td>
     <td>${t.caseId?caseName(t.caseId):'—'}</td>
+    <td>${t.reminder?`<span style="color:${isOverdue(t.reminder)&&!t.done?'var(--danger)':'var(--text2)'}">${fdate(t.reminder)}</span>`:'—'}</td>
     <td>${t.due?`<span style="color:${isOverdue(t.due)&&!t.done?'var(--danger)':'inherit'}">${fdate(t.due)}</span>`:'—'}</td>
     <td>${prioLabel(t.prio)}</td>
     <td><div style="display:flex;gap:6px;">
@@ -2197,7 +2202,7 @@ function renderDashboard(){
   const de=document.getElementById('dash-events');
   if(de)de.innerHTML=upcoming.length?upcoming.map(e=>`<div style="display:flex;align-items:center;gap:11px;padding:8px 0;border-bottom:1px solid var(--border);">
     <div style="background:rgba(59,130,246,.15);border-radius:7px;padding:5px 9px;text-align:center;min-width:44px;">
-      <div style="font-size:10px;color:var(--text3);">${['ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'][parseInt(e.date.split('-')[1])-1]}</div>
+      <div style="font-size:10px;color:var(--text3);">${['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'][parseInt(e.date.split('-')[1])-1]}</div>
       <div style="font-size:16px;font-weight:800;color:var(--accent2);">${parseInt(e.date.split('-')[2])}</div>
     </div>
     <div><div style="font-size:13px;font-weight:600;">${e.title}</div><div style="font-size:11px;color:var(--text3);">${e.time?`<span dir="ltr">${e.time.substring(0,5)}</span> · `:''}${e.loc||''}${e.caseId?' · '+caseName(e.caseId):''}</div></div>
@@ -2316,6 +2321,15 @@ async function gdriveLoad(){
 }
 
 // ══ MISSING FUNCTIONS ══
+
+function openNewClient(){
+  document.getElementById('mc-title').textContent='👤 לקוח חדש';
+  document.getElementById('mc-id').value='';
+  ['mc-name','mc-idnum','mc-phone','mc-email','mc-addr','mc-notes'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  openModal('client');
+}
 
 function openNewCase(){
   fillClientSelect('mcs-client');
@@ -2667,14 +2681,6 @@ function applyChargeTemplate() {
 renderDashboard();
 renderCalendar();
 updateBadge();
-// reset new-client modal title on open
-document.getElementById('modal-client').addEventListener('click',e=>{
-  if(e.target===e.currentTarget){return;}
-});
-document.querySelector('[data-view="clients"]').addEventListener('click',()=>{
-  document.getElementById('mc-title').textContent='👤 לקוח חדש';
-  document.getElementById('mc-id').value='';
-});
 </script>
 </body>
 </html>
