@@ -1844,14 +1844,18 @@ function openTaskForCase() {
 
 function openChargeForCase() {
   fillClientSelect('mch-client');
-  const c = DB.cases.find(x => x.id == activeCaseId);
+  fillCaseSelect('mch-case');
+  fillChargeTemplateSelect();
+  const cas = DB.cases.find(x => x.id == activeCaseId);
   document.getElementById('mch-title').textContent = '💰 חיוב חדש';
   document.getElementById('mch-id').value = '';
   ['mch-desc','mch-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('mch-amount').value = '';
   document.getElementById('mch-date').value = today();
   document.getElementById('mch-status').value = 'unpaid';
-  if (c) { document.getElementById('mch-client').value = c.clientId; onChargeClient(); document.getElementById('mch-case').value = activeCaseId; }
+  document.getElementById('mch-template').value = '';
+  const vp=document.getElementById('vat-preview');if(vp)vp.style.display='none';
+  if (cas) { document.getElementById('mch-client').value = cas.clientId; onChargeClient(); document.getElementById('mch-case').value = activeCaseId; }
   document.getElementById('modal-charge').classList.add('open');
 }
 
@@ -2138,6 +2142,8 @@ function saveCharge(){
 function editCharge(id){
   const c=DB.charges.find(x=>x.id==id);if(!c)return;
   fillClientSelect('mch-client');
+  fillChargeTemplateSelect();
+  document.getElementById('mch-template').value='';
   document.getElementById('mch-title').textContent='✏️ עריכת חיוב';
   document.getElementById('mch-id').value=c.id;
   document.getElementById('mch-desc').value=c.desc;
@@ -2148,6 +2154,7 @@ function editCharge(id){
   document.getElementById('mch-date').value=c.date||'';
   document.getElementById('mch-status').value=c.status;
   document.getElementById('mch-notes').value=c.notes||'';
+  updateVatPreview();
   document.getElementById('modal-charge').classList.add('open');
 }
 
