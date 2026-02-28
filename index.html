@@ -1727,6 +1727,8 @@ function duplicateHearing(hid) {
   document.getElementById('mh-del-btn').style.display = 'none';
   openModal('hearing');
 }
+
+function editHearing(hid) {
   const c = DB.cases.find(x => x.id == activeCaseId); if (!c) return;
   const h = (c.hearings || []).find(x => x.id === hid); if (!h) return;
   document.getElementById('mh-title').textContent = '✏️ עריכת דיון';
