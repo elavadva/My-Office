@@ -1617,6 +1617,7 @@ function renderCaseHearings(c) {
         <div class="cev-sub">${h.time?ftime(h.time)+' · ':''}${h.loc?h.loc+' · ':''}${h.judge?'כב׳ '+escHtml(h.judge):''}${h.notes?`<br><span style="color:var(--text3)">${escHtml(h.notes)}</span>`:''}</div>
       </div>
       <div style="display:flex;gap:4px;flex-shrink:0;">
+        <button class="btn btn-ghost btn-xs" onclick="duplicateHearing('${h.id}')" title="שכפול דיון">⧉</button>
         <button class="btn btn-ghost btn-xs" onclick="editHearing('${h.id}')">✏️</button>
         <button class="btn btn-danger-soft btn-xs" onclick="deleteHearingById('${h.id}')">🗑</button>
       </div>
@@ -1710,7 +1711,22 @@ function openCaseHearingModal() {
   document.getElementById('modal-hearing').classList.add('open');
 }
 
-function editHearing(hid) {
+function duplicateHearing(hid) {
+  const c = DB.cases.find(x => x.id == activeCaseId); if (!c) return;
+  const h = (c.hearings || []).find(x => x.id === hid); if (!h) return;
+  document.getElementById('mh-title').textContent = '⧉ שכפול דיון';
+  document.getElementById('mh-id').value = '';
+  document.getElementById('mh-caseid').value = activeCaseId;
+  document.getElementById('mh-title-inp').value = h.title;
+  document.getElementById('mh-date').value = '';
+  document.getElementById('mh-time').value = h.time || '';
+  document.getElementById('mh-loc').value = h.loc || '';
+  document.getElementById('mh-judge').value = h.judge || '';
+  document.getElementById('mh-notes').value = h.notes || '';
+  document.getElementById('mh-add-cal').checked = false;
+  document.getElementById('mh-del-btn').style.display = 'none';
+  openModal('hearing');
+}
   const c = DB.cases.find(x => x.id == activeCaseId); if (!c) return;
   const h = (c.hearings || []).find(x => x.id === hid); if (!h) return;
   document.getElementById('mh-title').textContent = '✏️ עריכת דיון';
