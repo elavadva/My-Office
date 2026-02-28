@@ -2603,18 +2603,18 @@ function deleteCaseType(i) {
 }
 
 function addSubtype() {
-  if (settingsSelectedType === null) return;
+  if (settingsSelectedType === null) { alert('בחרי קודם סוג ראשי'); return; }
   const name = document.getElementById('new-subtype-inp').value.trim();
   if (!name) return;
   DB.caseTypes[settingsSelectedType].subtypes.push(name);
   document.getElementById('new-subtype-inp').value = '';
-  dbSave(); renderSubtypesList(); renderTypesList();
+  dbSave(); renderSubtypesList(); renderTypesList(); fillCaseTypeSelect();
 }
 
 function deleteSubtype(j) {
   if (settingsSelectedType === null) return;
   DB.caseTypes[settingsSelectedType].subtypes.splice(j, 1);
-  dbSave(); renderSubtypesList(); renderTypesList();
+  dbSave(); renderSubtypesList(); renderTypesList(); fillCaseTypeSelect();
 }
 
 function fillCaseTypeSelect() {
