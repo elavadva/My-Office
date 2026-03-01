@@ -1592,7 +1592,11 @@ function renderCaseProfile(id) {
       <option value="partial"${ch.status==='partial'?' selected':''}>חלקי</option>
       <option value="paid"${ch.status==='paid'?' selected':''}>שולם</option>
     </select></td>
-    <td><button class="btn btn-ghost btn-xs" onclick="editCharge(${ch.id})">✏️</button></td>
+    <td><div style="display:flex;gap:5px;">
+      <button class="btn btn-ghost btn-xs" onclick="duplicateCharge(${ch.id})" title="שכפול">⧉</button>
+      <button class="btn btn-ghost btn-xs" onclick="editCharge(${ch.id})">✏️</button>
+      <button class="btn btn-danger-soft btn-xs" onclick="deleteCharge(${ch.id})">🗑</button>
+    </div></td>
   </tr>`).join('')
   : '<tr><td colspan="5"><div class="empty" style="padding:24px;"><div class="empty-icon" style="font-size:28px;">💰</div><div class="empty-text">אין חיובים</div></div></td></tr>';
 }
@@ -2180,6 +2184,27 @@ function deleteCharge(id){
   if(!confirm('למחוק?'))return;
   DB.charges=DB.charges.filter(c=>c.id!=id);
   dbSave();renderCharges();renderDashboard();
+  if(activeCaseId)renderCaseProfile(DB.cases.find(x=>x.id==activeCaseId));
+}
+
+function duplicateCharge(id){
+  const ch=DB.charges.find(x=>x.id==id);if(!ch)return;
+  fillClientSelect('mch-client');
+  fillCaseSelect('mch-case');
+  fillChargeTemplateSelect();
+  document.getElementById('mch-template').value='';
+  document.getElementById('mch-title').textContent='⧉ שכפול חיוב';
+  document.getElementById('mch-id').value='';
+  document.getElementById('mch-desc').value=ch.desc;
+  document.getElementById('mch-client').value=ch.clientId;
+  onChargeClient();
+  document.getElementById('mch-case').value=ch.caseId||'';
+  document.getElementById('mch-amount').value=ch.amount;
+  document.getElementById('mch-date').value=today();
+  document.getElementById('mch-status').value='unpaid';
+  document.getElementById('mch-notes').value=ch.notes||'';
+  updateVatPreview();
+  document.getElementById('modal-charge').classList.add('open');
 }
 
 function onChargeClient(){
