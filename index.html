@@ -375,6 +375,7 @@ select option{background:var(--surface);}
 }
 .log-entry-date{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600;}
 .log-entry-text{font-size:13px;line-height:1.6;white-space:pre-wrap;}
+.log-entry-actions{display:flex;gap:5px;margin-top:7px;}
 .log-entry-del{
   position:absolute;top:8px;left:8px;
   display:none;cursor:pointer;color:var(--text3);font-size:13px;
@@ -1559,7 +1560,10 @@ function renderCaseProfile(id) {
       <div class="log-entry">
         <div class="log-entry-date">${fdate(entry.date)} · <span style="color:var(--accent)">${typeLabels[entry.type]||entry.type}</span></div>
         <div class="log-entry-text">${escHtml(entry.text)}</div>
-        <button class="log-entry-del" onclick="deleteLogEntry(${id},'${entry.id}')" title="מחיקה">✕</button>
+        <div class="log-entry-actions">
+          <button class="btn btn-ghost btn-xs" onclick="editLogEntry(${id},'${entry.id}')" title="עריכה">✏️</button>
+          <button class="btn btn-danger-soft btn-xs" onclick="deleteLogEntry(${id},'${entry.id}')" title="מחיקה">🗑</button>
+        </div>
       </div>`).join('');
   }
 
@@ -1694,6 +1698,18 @@ function saveLogEntry() {
     c.log.push({ id: 'l' + uid(), date, type: document.getElementById('ml-type').value, text });
   }
   dbSave(); closeModal('log'); renderCaseProfile(cid);
+}
+
+function editLogEntry(caseId, logId) {
+  const c = DB.cases.find(x => x.id == caseId); if (!c) return;
+  const entry = (c.log || []).find(e => e.id === logId); if (!entry) return;
+  document.getElementById('ml-title').textContent = '✏️ עריכת פעולה';
+  document.getElementById('ml-id').value = logId;
+  document.getElementById('ml-caseid').value = caseId;
+  document.getElementById('ml-date').value = entry.date;
+  document.getElementById('ml-type').value = entry.type;
+  document.getElementById('ml-text').value = entry.text;
+  openModal('log');
 }
 
 function deleteLogEntry(caseId, logId) {
