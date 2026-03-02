@@ -2028,7 +2028,7 @@ function renderTasks(){
   list=[...list].sort((a,b)=>{
     const pv={high:0,med:1,low:2};
     if(pv[a.prio]!==pv[b.prio])return pv[a.prio]-pv[b.prio];
-    return(a.due||'').localeCompare(b.due||'');
+    return(a.reminder||a.due||'').localeCompare(b.reminder||b.due||'');
   });
   const tbody=document.getElementById('tasks-tbody');
   if(!list.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">✅</div><div class="empty-text">אין משימות</div></div></td></tr>';return;}
@@ -2264,15 +2264,15 @@ function renderDashboard(){
   document.getElementById('s-charges').textContent='₪'+DB.charges.filter(c=>c.status!=='paid').reduce((s,c)=>s+c.amount,0).toLocaleString();
   const td=today();
   const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);const tmr=tomorrow.toISOString().split('T')[0];
-  const allReminders=DB.tasks.filter(t=>!t.done&&t.reminder&&t.reminder<=tmr).sort((a,b)=>(a.reminder||'').localeCompare(b.reminder||''));
-  const elSR=document.getElementById('s-reminders');if(elSR)elSR.textContent=allReminders.filter(t=>t.reminder<=td).length;
+  const allReminders=DB.tasks.filter(t=>!t.done&&t.reminder&&t.reminder<=td).sort((a,b)=>(a.reminder||'').localeCompare(b.reminder||''));
+  const elSR=document.getElementById('s-reminders');if(elSR)elSR.textContent=allReminders.length;
   // Reminders panel
   const dr=document.getElementById('dash-reminders');
   if(dr)dr.innerHTML=allReminders.length?allReminders.slice(0,6).map(t=>`<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border);">
     <input type="checkbox" onchange="toggleTask(${t.id})" style="accent-color:var(--accent2);width:14px;height:14px;cursor:pointer;">
     <div style="flex:1;"><div style="font-size:13px;font-weight:600;">${t.title}</div><div style="font-size:11px;color:${isOverdue(t.reminder)?'var(--danger)':'var(--text3)'};">${fdate(t.reminder)}${t.caseId?' · '+caseName(t.caseId):''}</div></div>
     ${prioLabel(t.prio)}
-  </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:14px 0;">אין תזכורות להיום 🎉</div>';
+  </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:14px 0;">אין תזכורות פעילות 🎉</div>';
   // Events panel
   const upcoming=[...DB.events].filter(e=>e.date>=td).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,5);
   const de=document.getElementById('dash-events');
