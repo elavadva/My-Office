@@ -1398,6 +1398,11 @@ function saveClient(){
   if(eid){const i=DB.clients.findIndex(c=>c.id==eid);DB.clients[i]=obj;}
   else DB.clients.push(obj);
   dbSave();closeModal('client');
+  document.getElementById('mc-id').value='';
+  ['mc-firstname','mc-lastname','mc-idnum','mc-phone','mc-email','mc-addr','mc-notes'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('mc-title').textContent='👤 לקוח חדש';
   if(currentView==='clients')renderClients();
   else if(currentView==='client-profile')renderProfile(obj.id);
   renderDashboard();
