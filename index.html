@@ -1149,34 +1149,71 @@ select option{background:var(--surface);}
 
 <div class="modal-overlay" id="modal-backup">
   <div class="modal">
-    <div class="modal-title">☁️ גיבוי ושחזור נתונים</div>
+    <div class="modal-title">☁️ סנכרון וגיבוי</div>
 
-    <div class="bk-option" onclick="exportJSON()">
-      <h4>📥 ייצוא JSON</h4>
-      <p>הורדת קובץ גיבוי מלא למחשב. שמרי ב-iCloud Drive — יסתנכרן אוטומטית בין Mac ו-iPhone שלך.</p>
-    </div>
-
-    <div class="bk-option" onclick="triggerImport();closeModal('backup')">
-      <h4>📤 ייבוא מקובץ JSON</h4>
-      <p>שחזור נתונים מקובץ גיבוי שנשמר קודם.</p>
-    </div>
-
-    <div class="bk-option">
-      <h4>🟢 Google Drive — גיבוי אוטומטי</h4>
-      <p>התחברי פעם אחת, ומעכשיו הנתונים יישמרו אוטומטית ב-Google Drive שלך.</p>
-      <div class="bk-btns">
-        <button class="btn btn-primary btn-sm" onclick="gdriveConnect()">🔗 התחברות</button>
-        <button class="btn btn-ghost btn-sm" onclick="gdriveSave()">💾 שמור עכשיו</button>
-        <button class="btn btn-ghost btn-sm" onclick="gdriveLoad()">🔄 שחזר מהענן</button>
+    <!-- iCloud Drive - PRIMARY -->
+    <div style="background:rgba(30,79,160,.06);border:1px solid rgba(30,79,160,.2);border-radius:12px;padding:18px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:36px;height:36px;background:rgba(30,79,160,.12);border-radius:9px;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1e4fa0" stroke-width="1.6" width="20" height="20"><path d="M5 17a4 4 0 01-.5-7.9A6 6 0 0117.4 10H18a4 4 0 010 8H5z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:700;">iCloud Drive — מומלץ</div>
+          <div style="font-size:11px;color:var(--text3);">סנכרון אוטומטי בין Mac ו-iPhone</div>
+        </div>
+        <span style="margin-right:auto;background:#1e6e40;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;">הכי פשוט</span>
       </div>
-      <div id="gdrive-status"></div>
-      <div class="hint" style="margin-top:10px;">
-        ✅ Google Drive מוגדר ומוכן לשימוש. לחצי "התחברות" בכל פעם שתפתחי את האפליקציה מחדש.
+      <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px;">
+        ייצאי קובץ JSON פעם אחת ← שמרי אותו ב-iCloud Drive ←<br>
+        מעכשיו ייבאי ממנו ושמרי אליו — יסתנכרן אוטומטית בכל המכשירים שלך.
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="exportToiCloud()">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13" style="vertical-align:middle;margin-left:4px"><path d="M10 3v10M6 9l4 4 4-4"/><path d="M3 15h14"/></svg>
+          שמור ל-iCloud Drive
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="triggerImport();closeModal('backup')">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13" style="vertical-align:middle;margin-left:4px"><path d="M10 13V3M6 7l4-4 4 4"/><path d="M3 15h14"/></svg>
+          טען מ-iCloud Drive
+        </button>
       </div>
     </div>
 
-    <div class="hint">
-      📱 <strong>iCloud Drive:</strong> ייצאי JSON ← שמרי ב-iCloud Drive ← ניגש מכל המכשירים שלך אוטומטית
+    <!-- Auto-sync status -->
+    <div id="sync-status-bar" style="display:none;align-items:center;gap:8px;padding:10px 14px;background:rgba(30,110,64,.07);border:1px solid rgba(30,110,64,.2);border-radius:9px;margin-bottom:14px;font-size:12px;color:var(--success);">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 10l4 4 8-8"/></svg>
+      <span id="sync-status-text">מסונכרן</span>
+    </div>
+
+    <!-- Google Drive - SECONDARY -->
+    <div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:36px;height:36px;background:rgba(0,0,0,.04);border-radius:9px;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L6 13h12L12 2z" fill="#1a73e8" opacity=".8"/><path d="M6 13L2 20h8L6 13z" fill="#ea4335" opacity=".8"/><path d="M18 13l-4 7h8l-4-7z" fill="#fbbc04" opacity=".9"/></svg>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:700;">Google Drive</div>
+          <div style="font-size:11px;color:var(--text3);">גיבוי ידני לענן</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="gdriveConnect()">התחברות</button>
+        <button class="btn btn-ghost btn-sm" onclick="gdriveSave()">שמור</button>
+        <button class="btn btn-ghost btn-sm" onclick="gdriveLoad()">שחזר</button>
+      </div>
+      <div id="gdrive-status" style="margin-top:8px;font-size:12px;"></div>
+    </div>
+
+    <!-- JSON backup -->
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost btn-sm" onclick="exportJSON()" style="flex:1;">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13" style="vertical-align:middle;margin-left:4px"><path d="M10 3v10M6 9l4 4 4-4"/><path d="M3 15h14"/></svg>
+        ייצוא JSON
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="triggerImport();closeModal('backup')" style="flex:1;">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13" style="vertical-align:middle;margin-left:4px"><path d="M10 13V3M6 7l4-4 4 4"/><path d="M3 15h14"/></svg>
+        ייבוא JSON
+      </button>
     </div>
 
     <div class="modal-actions" style="margin-top:16px;">
@@ -1229,10 +1266,47 @@ let profileClientId = null;
 
 // ══ PERSIST ══
 const STORE_KEY = 'lm_v3';
+let _autoSaveHandle = null;
+let _iCloudFileHandle = null;
+
 function dbSave(){
   try{localStorage.setItem(STORE_KEY,JSON.stringify(DB));}catch(e){}
-  // auto-gdrive if connected
   if(gdriveToken) setTimeout(gdriveSave,500);
+  if(_iCloudFileHandle){
+    clearTimeout(_autoSaveHandle);
+    _autoSaveHandle = setTimeout(()=>_writeToFile(_iCloudFileHandle), 1500);
+  }
+}
+
+async function _writeToFile(handle){
+  try{
+    const writable = await handle.createWritable();
+    await writable.write(JSON.stringify(DB,null,2));
+    await writable.close();
+    const bar = document.getElementById('sync-status-bar');
+    const txt = document.getElementById('sync-status-text');
+    if(bar && txt){
+      bar.style.display='flex';
+      txt.textContent='נשמר אוטומטית · '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+    }
+  }catch(e){ console.log('auto-save error',e); }
+}
+
+async function exportToiCloud(){
+  try{
+    const handle = await window.showSaveFilePicker({
+      suggestedName:'legal-manager-data.json',
+      types:[{description:'JSON',accept:{'application/json':['.json']}}]
+    });
+    _iCloudFileHandle = handle;
+    await _writeToFile(handle);
+    const bar = document.getElementById('sync-status-bar');
+    if(bar) bar.style.display='flex';
+    alert('✅ הקובץ נשמר!\n\nחשוב: שמרי אותו בתיקיית iCloud Drive\nמעכשיו כל שינוי יישמר אוטומטית לאותו קובץ.');
+    closeModal('backup');
+  }catch(e){
+    if(e.name !== 'AbortError') exportJSON();
+  }
 }
 function dbLoad(){
   try{const d=localStorage.getItem(STORE_KEY);if(d)DB=JSON.parse(d);}catch(e){}
