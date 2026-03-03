@@ -1732,7 +1732,8 @@ function renderCaseProfile(id) {
     <td>${t.reminder?`<span style="color:${isOverdue(t.reminder)&&!t.done?'var(--danger)':'var(--text2)'};">${fdate(t.reminder)}</span>`:'—'}</td>
     <td>${t.due?`<span style="color:${isOverdue(t.due)&&!t.done?'var(--danger)':'inherit'}">${fdate(t.due)}</span>`:'—'}</td>
     <td>${prioLabel(t.prio)}</td>
-    <td><button class="btn btn-ghost btn-xs" onclick="editTask(${t.id})">✏️</button></td>
+    <td><button class="btn btn-ghost btn-xs" onclick="editTask(${t.id})">✏️</button>
+      <button class="btn btn-danger-soft btn-xs" onclick="deleteTask(${t.id})" title="מחיקה">🗑</button></td>
   </tr>`).join('')
   : '<tr><td colspan="5"><div class="empty" style="padding:24px;"><div class="empty-icon" style="font-size:28px;">✅</div><div class="empty-text">אין משימות</div></div></td></tr>';
 
@@ -2047,7 +2048,7 @@ function openTaskForCase() {
   document.getElementById('mt-title').textContent = '✅ משימה חדשה';
   document.getElementById('mt-id').value = '';
   ['mt-title-inp','mt-due','mt-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('mt-prio').value = 'med';
+  document.getElementById('mt-prio').value = 'low';
   document.getElementById('mt-case').value = activeCaseId;
   document.getElementById('modal-task').classList.add('open');
 }
@@ -2213,7 +2214,7 @@ function renderTasks(){
     <td>${prioLabel(t.prio)}</td>
     <td><div style="display:flex;gap:6px;">
       <button class="btn btn-ghost btn-xs" onclick="editTask(${t.id})">✏️</button>
-      <button class="btn btn-danger-soft btn-xs" onclick="deleteTask(${t.id})">🗑</button>
+      <button class="btn btn-danger-soft btn-xs" onclick="deleteTask(${t.id})" title="מחיקה">🗑</button>
     </div></td>
   </tr>`).join('');
 }
@@ -2600,7 +2601,7 @@ function openNewTask(){
   document.getElementById('mt-id').value='';
   ['mt-title-inp','mt-due','mt-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const mr=document.getElementById('mt-reminder');if(mr)mr.value='';
-  document.getElementById('mt-prio').value='med';
+  document.getElementById('mt-prio').value='low';
   openModal('task');
 }
 
