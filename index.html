@@ -679,6 +679,7 @@ select option{background:var(--surface);}
           <thead><tr><th>תיאור</th><th>סכום</th><th>תאריך</th><th>סטטוס</th><th></th></tr></thead>
           <tbody id="cp-charges-tbody"></tbody>
         </table></div>
+        <div id="cp-charges-summary" style="display:none;"></div>
       </div>
     </div>
   </div>
@@ -1752,6 +1753,26 @@ function renderCaseProfile(id) {
     </div></td>
   </tr>`).join('')
   : '<tr><td colspan="5"><div class="empty" style="padding:24px;"><div class="empty-icon" style="font-size:28px;">💰</div><div class="empty-text">אין חיובים</div></div></td></tr>';
+
+  // ── סיכום חיובים לתיק ──
+  const totalAll    = caseCharges.reduce((s,ch)=>s+Number(ch.amount),0);
+  const totalPaid   = caseCharges.filter(ch=>ch.status==='paid').reduce((s,ch)=>s+Number(ch.amount),0);
+  const totalUnpaid = caseCharges.filter(ch=>ch.status!=='paid').reduce((s,ch)=>s+Number(ch.amount),0);
+  const summEl = document.getElementById('cp-charges-summary');
+  if(summEl){
+    if(caseCharges.length){
+      summEl.style.display='block';
+      summEl.innerHTML=`<div style="display:flex;gap:20px;flex-wrap:wrap;font-size:13px;padding:12px 16px;background:var(--surface2);border-radius:10px;margin-top:12px;">
+        <div><span style="color:var(--text3);font-size:11px;font-weight:700;display:block;margin-bottom:2px;">סה״כ</span><strong style="font-size:16px;">&#x20AA;${totalAll.toLocaleString()}</strong></div>
+        <div style="width:1px;background:var(--border);"></div>
+        <div><span style="color:var(--text3);font-size:11px;font-weight:700;display:block;margin-bottom:2px;">שולם</span><strong style="font-size:16px;color:var(--success);">&#x20AA;${totalPaid.toLocaleString()}</strong></div>
+        <div style="width:1px;background:var(--border);"></div>
+        <div><span style="color:var(--text3);font-size:11px;font-weight:700;display:block;margin-bottom:2px;">לגבייה</span><strong style="font-size:16px;color:var(--danger);">&#x20AA;${totalUnpaid.toLocaleString()}</strong></div>
+      </div>`;
+    } else {
+      summEl.style.display='none';
+    }
+  }
 }
 
 function renderCaseHearings(c) {
