@@ -8,6 +8,8 @@
 <meta http-equiv="Expires" content="0">
 <title>ניהול תיקים משפטיים</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;ניהול תיקים משפטיים&quot;,&quot;short_name&quot;:&quot;משרד עו״ד&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%230d1018&quot;,&quot;theme_color&quot;:&quot;%23c9a84c&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/2696.png&quot;,&quot;sizes&quot;:&quot;72x72&quot;,&quot;type&quot;:&quot;image/png&quot;}]}">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1266,6 +1268,64 @@ let profileClientId = null;
 
 // ══ PERSIST ══
 const STORE_KEY = 'lm_v3';
+// ══ FIREBASE ══
+const firebaseConfig = {
+  apiKey: "AIzaSyDjB_OMo5asz1TomsKJUocjGljNJ-fSKKQ",
+  authDomain: "my-office-66216.firebaseapp.com",
+  projectId: "my-office-66216",
+  storageBucket: "my-office-66216.firebasestorage.app",
+  messagingSenderId: "171358781515",
+  appId: "1:171358781515:web:93f0197f82a8ae37d2cdce"
+};
+firebase.initializeApp(firebaseConfig);
+const fsDb = firebase.firestore();
+const DOC_REF = fsDb.collection('office').doc('data');
+let _syncTimeout = null;
+let _syncBadge = null;
+
+function showSyncBadge(msg, color){
+  if(!_syncBadge){
+    _syncBadge = document.createElement('div');
+    _syncBadge.style.cssText = 'position:fixed;bottom:20px;left:20px;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;direction:rtl;transition:opacity .4s;box-shadow:0 2px 12px rgba(0,0,0,.15);';
+    document.body.appendChild(_syncBadge);
+  }
+  _syncBadge.style.background = color==='ok' ? '#1e6e40' : color==='err' ? '#b83a4a' : '#1a3a6e';
+  _syncBadge.style.color = '#fff';
+  _syncBadge.style.opacity = '1';
+  _syncBadge.textContent = msg;
+  clearTimeout(_syncBadge._t);
+  _syncBadge._t = setTimeout(()=>{ _syncBadge.style.opacity='0'; }, 2500);
+}
+
+async function cloudSave(){
+  try{
+    const data = JSON.parse(JSON.stringify(DB));
+    await DOC_REF.set(data);
+    showSyncBadge('☁️ נשמר', 'ok');
+  }catch(e){
+    showSyncBadge('⚠️ שגיאת ענן', 'err');
+  }
+}
+
+async function cloudLoad(){
+  try{
+    showSyncBadge('☁️ מסנכרן...', 'info');
+    const snap = await DOC_REF.get();
+    if(snap.exists){
+      const data = snap.data();
+      if(!data._id) data._id = 1;
+      DB = data;
+      try{localStorage.setItem(STORE_KEY, JSON.stringify(DB));}catch(e){}
+      renderDashboard(); renderCalendar(); updateBadge();
+      showSyncBadge('☁️ מסונכרן', 'ok');
+    } else {
+      await cloudSave();
+    }
+  }catch(e){
+    showSyncBadge('⚠️ ללא ענן — נתונים מקומיים', 'err');
+  }
+}
+
 let _autoSaveHandle = null;
 let _iCloudFileHandle = null;
 
@@ -1276,6 +1336,9 @@ function dbSave(){
     clearTimeout(_autoSaveHandle);
     _autoSaveHandle = setTimeout(()=>_writeToFile(_iCloudFileHandle), 1500);
   }
+  // sync to cloud - debounced
+  clearTimeout(_syncTimeout);
+  _syncTimeout = setTimeout(cloudSave, 1500);
 }
 
 async function _writeToFile(handle){
@@ -2843,9 +2906,12 @@ function applyChargeTemplate() {
 }
 
 
+dbLoad();
 renderDashboard();
 renderCalendar();
 updateBadge();
+// sync from cloud
+setTimeout(cloudLoad, 800);
 </script>
 </body>
 </html>
