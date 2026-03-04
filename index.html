@@ -2777,8 +2777,13 @@ function runAdvSearch(){
     DB.tasks.filter(t=>!text||t.title.toLowerCase().includes(text)||(t.notes||'').toLowerCase().includes(text))
     .forEach(t=>results.push({type:'משימה',title:t.title,sub:(t.caseId?caseName(t.caseId)+' · ':'')+(t.due?fdate(t.due):''),onclick:`editTask(${t.id})`}));
   if(!type||type==='charge')
-    DB.charges.filter(ch=>!text||ch.desc.toLowerCase().includes(ch))
-    .forEach(ch=>results.push({type:'חיוב',title:ch.desc,sub:clientName(ch.clientId)+' · ₪'+Number(ch.amount).toLocaleString(),onclick:`editCharge(${ch.id})`}));
+    DB.charges.filter(ch=>
+      (!text||(ch.desc||'').toLowerCase().includes(text)||(ch.notes||'').toLowerCase().includes(text)||clientName(ch.clientId).toLowerCase().includes(text)||(ch.caseId?caseName(ch.caseId):'').toLowerCase().includes(text))&&
+      (!clientId||String(ch.clientId)===String(clientId))&&
+      (!from||ch.date>=from)&&
+      (!to||ch.date<=to)
+    )
+    .forEach(ch=>results.push({type:'חיוב',title:ch.desc,sub:clientName(ch.clientId)+(ch.caseId?' · '+caseName(ch.caseId):'')+' · ₪'+Number(ch.amount).toLocaleString()+' · '+fdate(ch.date),onclick:`editCharge(${ch.id})`}));
   const el=document.getElementById('adv-results');if(!el)return;
   if(!results.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">לא נמצאו תוצאות</div></div>';return;}
   el.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;">${results.map(r=>`<div class="search-result-item" onclick="${r.onclick}"><span class="sri-type">${r.type}</span><div><div class="sri-title">${r.title}</div><div class="sri-sub">${r.sub}</div></div></div>`).join('')}</div>`;
