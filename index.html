@@ -2479,7 +2479,10 @@ function renderDashboard(){
   const dt=document.getElementById('dash-tasks');
   if(dt)dt.innerHTML=activeTasks.length?activeTasks.map(t=>`<div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);">
     <input type="checkbox" onchange="toggleTask(${t.id})" style="accent-color:var(--accent2);width:13px;height:13px;cursor:pointer;">
-    <div style="flex:1;">${t.title}</div>${prioLabel(t.prio)}
+    <div style="flex:1;cursor:${t.caseId?'pointer':'default'}" onclick="${t.caseId?'openCaseProfile('+t.caseId+')':''}">
+      <div style="font-size:13px;">${t.title}</div>
+      ${t.caseId?`<div style="font-size:11px;color:var(--accent);font-weight:600;">${caseName(t.caseId)}</div>`:''}
+    </div>${prioLabel(t.prio)}
   </div>`).join(''):'<div style="color:var(--text3);padding:10px 0;">אין משימות פעילות 🎉</div>';
   // Active cases (secondary/smaller)
   const activeCases=DB.cases.filter(c=>c.status!=='closed').slice(0,5);
