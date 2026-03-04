@@ -2055,7 +2055,6 @@ function openTaskForCase() {
 
 function openChargeForCase() {
   fillClientSelect('mch-client');
-  fillCaseSelect('mch-case');
   fillChargeTemplateSelect();
   const cas = DB.cases.find(x => x.id == activeCaseId);
   document.getElementById('mch-title').textContent = '💰 חיוב חדש';
@@ -2066,7 +2065,14 @@ function openChargeForCase() {
   document.getElementById('mch-status').value = 'unpaid';
   document.getElementById('mch-template').value = '';
   const vp=document.getElementById('vat-preview');if(vp)vp.style.display='none';
-  if (cas) { document.getElementById('mch-client').value = cas.clientId; onChargeClient(); document.getElementById('mch-case').value = activeCaseId; }
+  if (cas) {
+    document.getElementById('mch-client').value = cas.clientId;
+    fillCaseSelect('mch-case', cas.clientId);
+    document.getElementById('mch-case').value = activeCaseId;
+  } else {
+    fillCaseSelect('mch-case');
+  }
+  updateVatPreview && updateVatPreview();
   document.getElementById('modal-charge').classList.add('open');
 }
 
@@ -2333,7 +2339,9 @@ function saveCharge(){
   const desc=document.getElementById('mch-desc').value.trim();
   const cid=document.getElementById('mch-client').value;
   const amt=parseFloat(document.getElementById('mch-amount').value);
-  if(!desc||!cid||isNaN(amt)){alert('תיאור, לקוח וסכום חובה');return;}
+  if(!desc){alert('יש להזין תיאור חיוב');return;}
+  if(!cid){alert('יש לבחור לקוח');return;}
+  if(isNaN(amt)||amt<=0){alert('יש להזין סכום תקין');return;}
   const eid=document.getElementById('mch-id').value;
   const obj={
     id:eid||uid(),desc,clientId:parseInt(cid),
