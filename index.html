@@ -697,6 +697,10 @@ select option{background:var(--surface);}
         <option value="urgent">דחוף</option>
         <option value="closed">סגור</option>
       </select>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="cases-search" placeholder="חיפוש תיק, לקוח..." oninput="renderCases()" style="width:220px;">
+      </div>
     </div>
     <div class="card">
       <div class="table-wrap"><table>
@@ -716,6 +720,10 @@ select option{background:var(--surface);}
         <option value="all">הכל</option>
         <option value="done">הושלמו</option>
       </select>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="tasks-search" placeholder="חיפוש משימה..." oninput="renderTasks()" style="width:220px;">
+      </div>
     </div>
     <div class="card">
       <div class="table-wrap"><table>
@@ -2140,8 +2148,17 @@ function deleteCase(id){
 function renderCases(){
   fillClientSelect('mcs-client');
   const filter=document.getElementById('cases-filter')?.value||'';
+  const q=(document.getElementById('cases-search')?.value||'').toLowerCase().trim();
   let list=DB.cases;
   if(filter)list=list.filter(c=>c.status===filter);
+  if(q)list=list.filter(c=>
+    (c.name||'').toLowerCase().includes(q)||
+    (c.num||'').toLowerCase().includes(q)||
+    (clientName(c.clientId)||'').toLowerCase().includes(q)||
+    (c.type||'').toLowerCase().includes(q)||
+    (c.desc||'').toLowerCase().includes(q)||
+    (c.extraId||'').toLowerCase().includes(q)
+  );
   const tbody=document.getElementById('cases-tbody');
   if(!list.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">📁</div><div class="empty-text">אין תיקים</div></div></td></tr>';return;}
   tbody.innerHTML=list.map(c=>`<tr>
@@ -2207,11 +2224,17 @@ function deleteTask(id){
 
 function renderTasks(){
   const filter=document.getElementById('tasks-filter')?.value||'open';
+  const q=(document.getElementById('tasks-search')?.value||'').toLowerCase().trim();
   let list=DB.tasks;
   const td2=today();
   if(filter==='open')list=list.filter(t=>!t.done);
   if(filter==='done')list=list.filter(t=>t.done);
   if(filter==='reminder')list=list.filter(t=>!t.done&&((t.reminder&&t.reminder<=td2)||(t.due&&t.due<=td2)));
+  if(q)list=list.filter(t=>
+    (t.title||'').toLowerCase().includes(q)||
+    (t.notes||'').toLowerCase().includes(q)||
+    (t.caseId?caseName(t.caseId):'').toLowerCase().includes(q)
+  );
   list=[...list].sort((a,b)=>{
     const pv={high:0,med:1,low:2};
     if(pv[a.prio]!==pv[b.prio])return pv[a.prio]-pv[b.prio];
