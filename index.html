@@ -2458,7 +2458,10 @@ function renderDashboard(){
   const dr=document.getElementById('dash-reminders');
   if(dr)dr.innerHTML=allReminders.length?allReminders.slice(0,6).map(t=>`<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border);">
     <input type="checkbox" onchange="toggleTask(${t.id})" style="accent-color:var(--accent2);width:14px;height:14px;cursor:pointer;">
-    <div style="flex:1;"><div style="font-size:13px;font-weight:600;">${t.title}</div><div style="font-size:11px;color:${isOverdue(t.reminder)?'var(--danger)':'var(--text3)'};">${fdate(t.reminder)}${t.caseId?' · '+caseName(t.caseId):''}</div></div>
+    <div style="flex:1;cursor:${t.caseId?'pointer':'default'}" onclick="${t.caseId?`openCaseProfile(${t.caseId})`:''}">
+      <div style="font-size:13px;font-weight:600;">${t.title}</div>
+      <div style="font-size:11px;color:${isOverdue(t.reminder)?'var(--danger)':'var(--text3)'};">${fdate(t.reminder)}${t.caseId?` · <span style="color:var(--accent2);font-weight:600;">${caseName(t.caseId)}</span>`:''}</div>
+    </div>
     ${prioLabel(t.prio)}
   </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:14px 0;">אין תזכורות פעילות 🎉</div>';
   // Events panel
