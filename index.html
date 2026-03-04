@@ -1724,7 +1724,7 @@ function renderCaseProfile(id) {
   // Meetings
   renderCaseMeetings(c);
   // Tasks
-  const caseTasks = DB.tasks.filter(t => t.caseId == id);
+  const caseTasks = DB.tasks.filter(t => String(t.caseId) === String(id));
   const ctbody = document.getElementById('cp-tasks-tbody');
   ctbody.innerHTML = caseTasks.length ? caseTasks.map(t => `<tr class="${t.done?'task-done':''}">
     <td><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id})" style="accent-color:var(--accent);width:15px;height:15px;"></td>
@@ -1738,7 +1738,7 @@ function renderCaseProfile(id) {
   : '<tr><td colspan="5"><div class="empty" style="padding:24px;"><div class="empty-icon" style="font-size:28px;">✅</div><div class="empty-text">אין משימות</div></div></td></tr>';
 
   // Charges
-  const caseCharges = DB.charges.filter(ch => ch.caseId == id);
+  const caseCharges = DB.charges.filter(ch => String(ch.caseId) === String(id));
   const ccbody = document.getElementById('cp-charges-tbody');
   ccbody.innerHTML = caseCharges.length ? caseCharges.map(ch => `<tr>
     <td>${ch.desc}</td>
@@ -2352,7 +2352,7 @@ function saveCharge(){
   const eid=document.getElementById('mch-id').value;
   const obj={
     id:eid||uid(),desc,clientId:parseInt(cid),
-    caseId:document.getElementById('mch-case').value,
+    caseId:parseInt(document.getElementById('mch-case').value)||'',
     amount:amt,
     date:document.getElementById('mch-date').value,
     status:document.getElementById('mch-status').value,
