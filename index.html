@@ -815,8 +815,8 @@ select option{background:var(--surface);}
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>מתאריך</label><input id="adv-from" type="date" dir="ltr"></div>
-        <div class="form-group"><label>עד תאריך</label><input id="adv-to" type="date" dir="ltr"></div>
+        <div class="form-group"><label>מתאריך</label><input id="adv-from" type="text" placeholder="dd.mm.yyyy" dir="ltr" maxlength="10"></div>
+        <div class="form-group"><label>עד תאריך</label><input id="adv-to" type="text" placeholder="dd.mm.yyyy" dir="ltr" maxlength="10"></div>
       </div>
       <div style="margin-top:4px;"><button class="btn btn-primary" onclick="runAdvSearch()">🔍 חיפוש</button></div>
     </div>
@@ -2759,13 +2759,21 @@ function initSearch(){
   sel.innerHTML='<option value="">כל הלקוחות</option>';
   DB.clients.forEach(c=>sel.innerHTML+=`<option value="${c.id}">${c.name}</option>`);
 }
+function parseSearchDate(s){
+  if(!s)return'';
+  s=s.trim();
+  // accept dd.mm.yyyy or yyyy-mm-dd
+  if(/^\d{2}\.\d{2}\.\d{4}$/.test(s)){const[d,m,y]=s.split('.');return`${y}-${m}-${d}`;}
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+  return'';
+}
 function runAdvSearch(){
   const text=(document.getElementById('adv-text')?.value||'').toLowerCase().trim();
   const type=document.getElementById('adv-type')?.value||'';
   const clientId=document.getElementById('adv-client')?.value||'';
   const status=document.getElementById('adv-status')?.value||'';
-  const from=document.getElementById('adv-from')?.value||'';
-  const to=document.getElementById('adv-to')?.value||'';
+  const from=parseSearchDate(document.getElementById('adv-from')?.value||'');
+  const to=parseSearchDate(document.getElementById('adv-to')?.value||'');
   const results=[];
   if(!type||type==='client')
     DB.clients.filter(c=>!text||c.name.toLowerCase().includes(text)||(c.phone||'').includes(text)||(c.email||'').toLowerCase().includes(text))
