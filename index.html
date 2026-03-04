@@ -1383,8 +1383,8 @@ function uid(){return DB._id++;}
 function today(){return new Date().toISOString().split('T')[0];}
 function fdate(d){if(!d)return'—';const[y,m,dd]=d.split('-');return`${dd}.${m}.${y}`;}
 function ftime(t){if(!t)return'';return`<span dir="ltr">${t.substring(0,5)}</span>`;}
-function clientName(id){const c=DB.clients.find(x=>String(x.id)===String(id));return c?c.name:'—';}
-function caseName(id){const c=DB.cases.find(x=>String(x.id)===String(id));return c?c.name:'—';}
+function clientName(id){const c=DB.clients.find(x=>x.id==id);return c?c.name:'—';}
+function caseName(id){const c=DB.cases.find(x=>x.id==id);return c?c.name:'—';}
 function initials(name){if(!name)return'?';const p=name.trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
 function isOverdue(d){return d&&d<today();}
 
@@ -2065,30 +2065,18 @@ function openChargeForCase() {
   document.getElementById('mch-status').value = 'unpaid';
   document.getElementById('mch-template').value = '';
   const vp=document.getElementById('vat-preview');if(vp)vp.style.display='none';
-function openChargeForCase() {
-  fillClientSelect('mch-client');
-  fillChargeTemplateSelect();
-  const cas = DB.cases.find(x => x.id == activeCaseId);
-  document.getElementById('mch-title').textContent = '💰 חיוב חדש';
-  document.getElementById('mch-id').value = '';
-  ['mch-desc','mch-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('mch-amount').value = '';
-  document.getElementById('mch-date').value = today();
-  document.getElementById('mch-status').value = 'unpaid';
-  document.getElementById('mch-template').value = '';
-  const vp=document.getElementById('vat-preview');if(vp)vp.style.display='none';
   if (cas) {
+    // Set client - force string match
     const clientSel = document.getElementById('mch-client');
-    const clientIdStr = String(cas.clientId);
-    for(let i=0;i<clientSel.options.length;i++){
-      if(clientSel.options[i].value===clientIdStr){clientSel.selectedIndex=i;break;}
-    }
+    Array.from(clientSel.options).forEach((opt,i) => {
+      if (String(opt.value) === String(cas.clientId)) clientSel.selectedIndex = i;
+    });
+    // Fill cases filtered by this client, then set the active case
     fillCaseSelect('mch-case', cas.clientId);
     const caseSel = document.getElementById('mch-case');
-    const caseIdStr = String(activeCaseId);
-    for(let i=0;i<caseSel.options.length;i++){
-      if(caseSel.options[i].value===caseIdStr){caseSel.selectedIndex=i;break;}
-    }
+    Array.from(caseSel.options).forEach((opt,i) => {
+      if (String(opt.value) === String(activeCaseId)) caseSel.selectedIndex = i;
+    });
   } else {
     fillCaseSelect('mch-case');
   }
@@ -2359,11 +2347,11 @@ function saveCharge(){
   const cid=document.getElementById('mch-client').value;
   const amt=parseFloat(document.getElementById('mch-amount').value);
   if(!desc){alert('יש להזין תיאור חיוב');return;}
-  if(!cid){alert('יש לבחור לקוח');return;}
-  if(isNaN(amt)||amt<=0){alert('יש להזין סכום תקין');return;}
+  if(!cid){alert('יש לבחור לקוח — בדקי שהלקוח נבחר בשדה "לקוח"');return;}
+  if(isNaN(amt)){alert('יש להזין סכום');return;}
   const eid=document.getElementById('mch-id').value;
   const obj={
-    id:eid||uid(),desc,clientId:cid,
+    id:eid||uid(),desc,clientId:parseInt(cid),
     caseId:document.getElementById('mch-case').value,
     amount:amt,
     date:document.getElementById('mch-date').value,
