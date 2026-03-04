@@ -2210,7 +2210,7 @@ function renderTasks(){
   const td2=today();
   if(filter==='open')list=list.filter(t=>!t.done);
   if(filter==='done')list=list.filter(t=>t.done);
-  if(filter==='reminder')list=list.filter(t=>!t.done&&t.reminder&&t.reminder<=td2);
+  if(filter==='reminder')list=list.filter(t=>!t.done&&((t.reminder&&t.reminder<=td2)||(t.due&&t.due<=td2)));
   list=[...list].sort((a,b)=>{
     const pv={high:0,med:1,low:2};
     if(pv[a.prio]!==pv[b.prio])return pv[a.prio]-pv[b.prio];
