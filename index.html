@@ -534,7 +534,7 @@ select option{background:var(--surface);}
     </div>
     <div class="dash-cols" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
       <div class="card">
-        <div class="card-title"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" width="15" height="15" style="margin-left:6px;vertical-align:middle"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l2.5 2.5"/></svg>משימות פתוחות</div>
+        <div class="card-title"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" width="15" height="15" style="margin-left:6px;vertical-align:middle"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l2.5 2.5"/></svg>תזכורות שהגיע מועדן</div>
         <div id="dash-tasks"></div>
       </div>
       <div class="card">
@@ -2499,26 +2499,45 @@ function renderDashboard(){
     </div>
     ${prioLabel(t.prio)}
   </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:14px 0;">אין תזכורות פעילות 🎉</div>';
-  // Events panel
-  const upcoming=[...DB.events].filter(e=>e.date>=td).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,5);
+  // Events panel - includes calendar events + hearings + meetings from cases
+  const upcomingEvents=[...DB.events].filter(e=>e.date>=td).map(e=>({
+    date:e.date,time:e.time||'',title:e.title,sub:(e.loc||'')+(e.caseId?' · '+caseName(e.caseId):''),onclick:null
+  }));
+  DB.cases.forEach(c=>{
+    (c.hearings||[]).filter(h=>h.date>=td).forEach(h=>upcomingEvents.push({
+      date:h.date,time:h.time||'',title:'🏛 '+h.title,sub:(h.loc||'')+(h.judge?' · כב׳ '+h.judge:'')+' · '+c.name,onclick:`openCaseProfile(${c.id})`
+    }));
+    (c.meetings||[]).filter(m=>m.date>=td).forEach(m=>upcomingEvents.push({
+      date:m.date,time:m.time||'',title:'🤝 '+m.title,sub:(m.loc||'')+' · '+c.name,onclick:`openCaseProfile(${c.id})`
+    }));
+  });
+  upcomingEvents.sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||''));
+  const upcoming=upcomingEvents.slice(0,6);
   const de=document.getElementById('dash-events');
-  if(de)de.innerHTML=upcoming.length?upcoming.map(e=>`<div style="display:flex;align-items:center;gap:11px;padding:8px 0;border-bottom:1px solid var(--border);">
-    <div style="background:rgba(59,130,246,.15);border-radius:7px;padding:5px 9px;text-align:center;min-width:44px;">
-      <div style="font-size:10px;color:var(--text3);">${['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'][parseInt(e.date.split('-')[1])-1]}</div>
+  if(de)de.innerHTML=upcoming.length?upcoming.map(e=>`<div style="display:flex;align-items:center;gap:11px;padding:8px 0;border-bottom:1px solid var(--border);cursor:${e.onclick?'pointer':'default'}" onclick="${e.onclick||''}">
+    <div style="background:rgba(59,130,246,.15);border-radius:7px;padding:5px 9px;text-align:center;min-width:44px;flex-shrink:0;">
+      <div style="font-size:10px;color:var(--text3);">${HM[parseInt(e.date.split('-')[1])-1]}</div>
       <div style="font-size:16px;font-weight:800;color:var(--accent2);">${parseInt(e.date.split('-')[2])}</div>
     </div>
-    <div><div style="font-size:13px;font-weight:600;">${e.title}</div><div style="font-size:11px;color:var(--text3);">${e.time?`<span dir="ltr">${e.time.substring(0,5)}</span> · `:''}${e.loc||''}${e.caseId?' · '+caseName(e.caseId):''}</div></div>
+    <div><div style="font-size:13px;font-weight:600;">${e.title}</div><div style="font-size:11px;color:var(--text3);">${e.time?`<span dir="ltr">${e.time.substring(0,5)}</span> · `:''}${e.sub}</div></div>
   </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:14px 0;">אין אירועים קרובים</div>';
-  // Active tasks (secondary/smaller)
-  const activeTasks=[...DB.tasks].filter(t=>!t.done).sort((a,b)=>{const pv={high:0,med:1,low:2};return pv[a.prio]-pv[b.prio];}).slice(0,5);
+  // Overdue reminders panel
+  const overdueTasks=[...DB.tasks].filter(t=>!t.done&&((t.reminder&&t.reminder<=td)||(t.due&&t.due<=td)))
+    .sort((a,b)=>{
+      const da=a.reminder||a.due||'';const db=b.reminder||b.due||'';
+      return da.localeCompare(db);
+    }).slice(0,6);
   const dt=document.getElementById('dash-tasks');
-  if(dt)dt.innerHTML=activeTasks.length?activeTasks.map(t=>`<div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);">
+  if(dt)dt.innerHTML=overdueTasks.length?overdueTasks.map(t=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--border);">
     <input type="checkbox" onchange="toggleTask(${t.id})" style="accent-color:var(--accent2);width:13px;height:13px;cursor:pointer;">
     <div style="flex:1;cursor:${t.caseId?'pointer':'default'}" onclick="${t.caseId?'openCaseProfile('+t.caseId+')':''}">
-      <div style="font-size:13px;">${t.title}</div>
-      ${t.caseId?`<div style="font-size:11px;color:var(--accent);font-weight:600;">${caseName(t.caseId)}</div>`:''}
+      <div style="font-size:13px;font-weight:600;">${t.title}</div>
+      <div style="font-size:11px;">
+        <span style="color:var(--danger);">${fdate(t.reminder||t.due)}</span>
+        ${t.caseId?` · <span style="color:var(--accent);font-weight:600;">${caseName(t.caseId)}</span>`:''}
+      </div>
     </div>${prioLabel(t.prio)}
-  </div>`).join(''):'<div style="color:var(--text3);padding:10px 0;">אין משימות פעילות 🎉</div>';
+  </div>`).join(''):'<div style="color:var(--text3);padding:10px 0;">אין תזכורות שהגיע מועדן 🎉</div>';
   // Active cases (secondary/smaller)
   const activeCases=DB.cases.filter(c=>c.status!=='closed').slice(0,5);
   const dac=document.getElementById('dash-active-cases');
