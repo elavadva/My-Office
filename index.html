@@ -1660,7 +1660,10 @@ document.querySelectorAll('.ptab').forEach(tab=>{
 
 function renderClients(filter){
   const grid=document.getElementById('clients-grid');
-  let list=DB.clients;
+  let list=[...DB.clients].sort((a,b)=>{
+    const lastName=n=>{const p=(n||'').trim().split(/\s+/);return p[p.length-1]||'';};
+    return lastName(a.name).localeCompare(lastName(b.name),'he');
+  });
   if(filter){const q=filter.toLowerCase();list=list.filter(c=>c.name.toLowerCase().includes(q)||(c.phone||'').includes(q)||(c.email||'').toLowerCase().includes(q));}
   if(!list.length){grid.innerHTML='<div class="empty"><div class="empty-icon">👤</div><div class="empty-text">אין לקוחות עדיין</div></div>';return;}
   grid.innerHTML=list.map(c=>{
@@ -2153,7 +2156,12 @@ function renderCases(){
   fillClientSelect('mcs-client');
   const filter=document.getElementById('cases-filter')?.value||'';
   const q=(document.getElementById('cases-search')?.value||'').toLowerCase().trim();
-  let list=DB.cases;
+  let list=[...DB.cases].sort((a,b)=>{
+    const an=parseInt((a.num||'').replace(/\D/g,''))||0;
+    const bn=parseInt((b.num||'').replace(/\D/g,''))||0;
+    if(an&&bn)return an-bn;
+    return(a.num||'').localeCompare(b.num||'','he');
+  });
   if(filter)list=list.filter(c=>c.status===filter);
   if(q)list=list.filter(c=>
     (c.name||'').toLowerCase().includes(q)||
