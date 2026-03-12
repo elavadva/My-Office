@@ -2157,10 +2157,14 @@ function renderCases(){
   const filter=document.getElementById('cases-filter')?.value||'';
   const q=(document.getElementById('cases-search')?.value||'').toLowerCase().trim();
   let list=[...DB.cases].sort((a,b)=>{
-    const an=parseInt((a.num||'').replace(/\D/g,''))||0;
-    const bn=parseInt((b.num||'').replace(/\D/g,''))||0;
-    if(an&&bn)return an-bn;
-    return(a.num||'').localeCompare(b.num||'','he');
+    const parse=n=>{
+      const parts=(n||'').split('-');
+      return[parseInt(parts[0])||0, parseInt(parts[1])||0];
+    };
+    const [a1,a2]=parse(a.num);
+    const [b1,b2]=parse(b.num);
+    if(a1!==b1)return a1-b1;
+    return a2-b2;
   });
   if(filter)list=list.filter(c=>c.status===filter);
   if(q)list=list.filter(c=>
