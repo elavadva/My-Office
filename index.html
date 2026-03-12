@@ -1221,6 +1221,13 @@ select option{background:var(--surface);}
       <div id="gdrive-status" style="margin-top:8px;font-size:12px;"></div>
     </div>
 
+    <!-- Auto backup restore -->
+    <div id="auto-backup-section" style="display:none;background:rgba(184,58,74,.07);border:1px solid rgba(184,58,74,.25);border-radius:10px;padding:12px;margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px;">🛡 גיבוי אוטומטי זמין</div>
+      <div id="auto-backup-info" style="font-size:11px;color:var(--text2);margin-bottom:8px;"></div>
+      <button class="btn btn-sm" style="background:var(--danger);color:#fff;" onclick="restoreAutoBackup()">שחזר מגיבוי אוטומטי</button>
+    </div>
+
     <!-- JSON backup -->
     <div style="display:flex;gap:8px;">
       <button class="btn btn-ghost btn-sm" onclick="exportJSON()" style="flex:1;">
@@ -1314,11 +1321,38 @@ function showSyncBadge(msg, color){
 
 async function cloudSave(){
   try{
+    // Safety check: never overwrite Firebase with fewer cases/clients than already there
+    const snap = await DOC_REF.get();
+    if(snap.exists){
+      const remote = snap.data();
+      const localCases = DB.cases?.length||0;
+      const remoteCases = remote.cases?.length||0;
+      const localClients = DB.clients?.length||0;
+      const remoteClients = remote.clients?.length||0;
+      // Count total hearings/log/meetings in remote
+      const remoteRich = (remote.cases||[]).reduce((s,c)=>(s+(c.hearings?.length||0)+(c.log?.length||0)+(c.meetings?.length||0)),0);
+      const localRich = (DB.cases||[]).reduce((s,c)=>(s+(c.hearings?.length||0)+(c.log?.length||0)+(c.meetings?.length||0)),0);
+      if(localCases < remoteCases || localClients < remoteClients || (remoteRich > 0 && localRich < remoteRich)){
+        showSyncBadge('⚠️ סנכרון בוטל — טוען מהענן', 'err');
+        // Reload from Firebase instead
+        const data = remote;
+        if(!data._id) data._id = 1;
+        DB = data;
+        try{localStorage.setItem(STORE_KEY, JSON.stringify(DB));}catch(e){}
+        renderDashboard(); renderCalendar(); updateBadge();
+        showSyncBadge('☁️ שוחזר מהענן', 'ok');
+        return;
+      }
+    }
     const data = JSON.parse(JSON.stringify(DB));
     await DOC_REF.set(data);
+    // Also save backup to localStorage with timestamp
+    try{
+      localStorage.setItem(STORE_KEY+'_backup', JSON.stringify({ts: new Date().toISOString(), data: DB}));
+    }catch(e){}
     showSyncBadge('☁️ נשמר', 'ok');
   }catch(e){
-    showSyncBadge('⚠️ שגיאת ענן', 'err');
+    showSyncBadge('⚠️ שגיאת ענן — נשמר מקומית', 'err');
   }
 }
 
@@ -2565,7 +2599,37 @@ function handleSearch(val){
 }
 
 // ══ BACKUP ══
-function openBackup(){document.getElementById('modal-backup').classList.add('open');}
+function openBackup(){
+  document.getElementById('modal-backup').classList.add('open');
+  // Show auto-backup if available
+  try{
+    const b=localStorage.getItem(STORE_KEY+'_backup');
+    const sec=document.getElementById('auto-backup-section');
+    const info=document.getElementById('auto-backup-info');
+    if(b&&sec&&info){
+      const parsed=JSON.parse(b);
+      const ts=new Date(parsed.ts).toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      const cases=parsed.data?.cases?.length||0;
+      const rich=(parsed.data?.cases||[]).reduce((s,c)=>(s+(c.hearings?.length||0)+(c.log?.length||0)+(c.meetings?.length||0)),0);
+      info.textContent=`נשמר: ${ts} · ${cases} תיקים · ${rich} פעולות (דיונים/יומן/פגישות)`;
+      sec.style.display='block';
+    }
+  }catch(e){}
+}
+function restoreAutoBackup(){
+  try{
+    const b=localStorage.getItem(STORE_KEY+'_backup');
+    if(!b){alert('לא נמצא גיבוי אוטומטי');return;}
+    const parsed=JSON.parse(b);
+    if(!confirm('לשחזר מהגיבוי האוטומטי? הנתונים הנוכחיים יוחלפו.')){return;}
+    DB=parsed.data;
+    localStorage.setItem(STORE_KEY,JSON.stringify(DB));
+    cloudSave();
+    renderDashboard();renderCalendar();updateBadge();
+    closeModal('backup');
+    alert('✅ שוחזר בהצלחה!');
+  }catch(e){alert('שגיאה בשחזור: '+e.message);}
+}
 function exportJSON(){
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,2)],{type:'application/json'}));
