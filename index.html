@@ -2249,7 +2249,7 @@ function renderTasks(){
   tbody.innerHTML=list.map(t=>`<tr class="${t.done?'task-done':''}">
     <td><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id})" style="cursor:pointer;accent-color:var(--accent2);width:15px;height:15px;"></td>
     <td><strong>${t.title}</strong>${t.notes?`<br><span style="font-size:11px;color:var(--text3)">${t.notes}</span>`:''}</td>
-    <td>${t.caseId?caseName(t.caseId):'—'}</td>
+    <td>${t.caseId?`<span class="case-row-link" onclick="openCaseProfile(${t.caseId})">${caseName(t.caseId)}</span>`:'—'}</td>
     <td>${t.reminder?`<span style="color:${isOverdue(t.reminder)&&!t.done?'var(--danger)':'var(--text2)'}">${fdate(t.reminder)}</span>`:'—'}</td>
     <td>${t.due?`<span style="color:${isOverdue(t.due)&&!t.done?'var(--danger)':'inherit'}">${fdate(t.due)}</span>`:'—'}</td>
     <td>${prioLabel(t.prio)}</td>
