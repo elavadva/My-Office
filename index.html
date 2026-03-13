@@ -1319,34 +1319,18 @@ function showSyncBadge(msg, color){
   _syncBadge._t = setTimeout(()=>{ _syncBadge.style.opacity='0'; }, 2500);
 }
 
+let _cloudLoaded = false; // true only after successful Firebase load
+
 async function cloudSave(){
+  // Block saving if Firebase was never successfully loaded this session
+  if(!_cloudLoaded){
+    showSyncBadge('⚠️ ממתין לטעינה מהענן...', 'err');
+    return;
+  }
   try{
-    // Safety check: never overwrite Firebase with fewer cases/clients than already there
-    const snap = await DOC_REF.get();
-    if(snap.exists){
-      const remote = snap.data();
-      const localCases = DB.cases?.length||0;
-      const remoteCases = remote.cases?.length||0;
-      const localClients = DB.clients?.length||0;
-      const remoteClients = remote.clients?.length||0;
-      // Count total hearings/log/meetings in remote
-      const remoteRich = (remote.cases||[]).reduce((s,c)=>(s+(c.hearings?.length||0)+(c.log?.length||0)+(c.meetings?.length||0)),0);
-      const localRich = (DB.cases||[]).reduce((s,c)=>(s+(c.hearings?.length||0)+(c.log?.length||0)+(c.meetings?.length||0)),0);
-      if(localCases < remoteCases || localClients < remoteClients || (remoteRich > 0 && localRich < remoteRich)){
-        showSyncBadge('⚠️ סנכרון בוטל — טוען מהענן', 'err');
-        // Reload from Firebase instead
-        const data = remote;
-        if(!data._id) data._id = 1;
-        DB = data;
-        try{localStorage.setItem(STORE_KEY, JSON.stringify(DB));}catch(e){}
-        renderDashboard(); renderCalendar(); updateBadge();
-        showSyncBadge('☁️ שוחזר מהענן', 'ok');
-        return;
-      }
-    }
     const data = JSON.parse(JSON.stringify(DB));
-    await DOC_REF.set(data);
-    // Also save backup to localStorage with timestamp
+    await DOC_REF.set(data, {source:'server'});
+    // Save timestamped backup
     try{
       localStorage.setItem(STORE_KEY+'_backup', JSON.stringify({ts: new Date().toISOString(), data: DB}));
     }catch(e){}
@@ -1359,19 +1343,26 @@ async function cloudSave(){
 async function cloudLoad(){
   try{
     showSyncBadge('☁️ מסנכרן...', 'info');
-    const snap = await DOC_REF.get();
+    // Force fetch from server, bypass cache
+    const snap = await DOC_REF.get({source:'server'});
     if(snap.exists){
       const data = snap.data();
       if(!data._id) data._id = 1;
       DB = data;
+      _cloudLoaded = true;
       try{localStorage.setItem(STORE_KEY, JSON.stringify(DB));}catch(e){}
       renderDashboard(); renderCalendar(); updateBadge();
       showSyncBadge('☁️ מסונכרן', 'ok');
     } else {
+      _cloudLoaded = true;
       await cloudSave();
     }
   }catch(e){
-    showSyncBadge('⚠️ ללא ענן — נתונים מקומיים', 'err');
+    // Firebase unreachable — use localStorage but BLOCK saving back to Firebase
+    showSyncBadge('⚠️ ללא ענן — נתונים מקומיים בלבד', 'err');
+    _cloudLoaded = false;
+    // Try again in 10 seconds
+    setTimeout(cloudLoad, 10000);
   }
 }
 
