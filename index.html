@@ -2177,6 +2177,8 @@ function editCase(id){
   document.getElementById('mcs-date').value=c.date||'';
   document.getElementById('mcs-court').value=c.court||'';
   document.getElementById('mcs-desc').value=c.desc||'';
+  fillReferrerSelect('mcs-referrer');
+  if(c.referrer)document.getElementById('mcs-referrer').value=c.referrer;
   document.getElementById('modal-case').classList.add('open');
 }
 
