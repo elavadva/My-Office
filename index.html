@@ -1320,48 +1320,76 @@ function showSyncBadge(msg, color){
 }
 
 let _cloudLoaded = false; // true only after successful Firebase load
-
-let _cloudLoaded = false;
+let _pendingSync = false; // true if we have unsaved changes waiting for cloud
 
 async function cloudSave(){
+  // Always save locally first — no matter what
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(DB));
+    localStorage.setItem(STORE_KEY+'_backup', JSON.stringify({ts: new Date().toISOString(), data: DB}));
+  }catch(e){}
+
   if(!_cloudLoaded){
-    showSyncBadge('⚠️ ממתין לטעינה מהענן...', 'err');
+    _pendingSync = true;
+    showSyncBadge('💾 נשמר מקומית — ממתין לענן', 'err');
     return;
   }
   try{
     const data = JSON.parse(JSON.stringify(DB));
     await DOC_REF.set(data);
-    try{
-      localStorage.setItem(STORE_KEY+'_backup', JSON.stringify({ts: new Date().toISOString(), data: DB}));
-    }catch(e){}
-    showSyncBadge('☁️ נשמר', 'ok');
+    _pendingSync = false;
+    showSyncBadge('☁️ נשמר בענן', 'ok');
   }catch(e){
-    showSyncBadge('⚠️ שגיאת ענן — נשמר מקומית', 'err');
+    _pendingSync = true;
+    showSyncBadge('💾 נשמר מקומית — שגיאת ענן', 'err');
   }
 }
 
 async function cloudLoad(){
   try{
     showSyncBadge('☁️ מסנכרן...', 'info');
-    // Disable offline persistence to force server fetch
     await firebase.firestore().disableNetwork();
     await firebase.firestore().enableNetwork();
     const snap = await DOC_REF.get();
     if(snap.exists){
-      const data = snap.data();
-      if(!data._id) data._id = 1;
-      DB = data;
-      _cloudLoaded = true;
-      try{localStorage.setItem(STORE_KEY, JSON.stringify(DB));}catch(e){}
-      renderDashboard(); renderCalendar(); updateBadge();
-      showSyncBadge('☁️ מסונכרן', 'ok');
+      const cloudData = snap.data();
+      if(!cloudData._id) cloudData._id = 1;
+
+      // Check if we have local data that's newer (pending sync)
+      const localBackup = localStorage.getItem(STORE_KEY+'_backup');
+      if(_pendingSync && localBackup){
+        // We have unsaved local changes — push them to cloud
+        _cloudLoaded = true;
+        showSyncBadge('☁️ מעלה שינויים מקומיים לענן...', 'info');
+        try{
+          await DOC_REF.set(DB);
+          _pendingSync = false;
+          try{localStorage.setItem(STORE_KEY, JSON.stringify(DB));}catch(e){}
+          renderDashboard(); renderCalendar(); updateBadge();
+          showSyncBadge('☁️ הנתונים המקומיים הועלו לענן', 'ok');
+        }catch(e){
+          showSyncBadge('⚠️ שגיאה בהעלאה לענן', 'err');
+        }
+      } else {
+        // Normal load from cloud
+        DB = cloudData;
+        _cloudLoaded = true;
+        try{localStorage.setItem(STORE_KEY, JSON.stringify(DB));}catch(e){}
+        renderDashboard(); renderCalendar(); updateBadge();
+        showSyncBadge('☁️ מסונכרן', 'ok');
+      }
     } else {
       _cloudLoaded = true;
       await cloudSave();
     }
   }catch(e){
-    showSyncBadge('⚠️ ללא ענן — נתונים מקומיים בלבד', 'err');
+    showSyncBadge('⚠️ ללא ענן — נשמר מקומית', 'err');
     _cloudLoaded = false;
+    // Load from local if available
+    try{
+      const local = localStorage.getItem(STORE_KEY);
+      if(local){ DB = JSON.parse(local); renderDashboard(); renderCalendar(); updateBadge(); }
+    }catch(ex){}
     setTimeout(cloudLoad, 10000);
   }
 }
