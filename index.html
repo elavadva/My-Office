@@ -2173,7 +2173,13 @@ function saveCase(){
     desc:document.getElementById('mcs-desc').value,
     updated:today()
   };
-  if(eid){const i=DB.cases.findIndex(c=>c.id==eid);DB.cases[i]=obj;}
+  if(eid){
+    const i=DB.cases.findIndex(c=>c.id==eid);
+    const existing=DB.cases[i];
+    obj.log = existing.log || [];
+    obj.hearings = existing.hearings || [];
+    DB.cases[i]=obj;
+  }
   else DB.cases.push(obj);
   dbSave();closeModal('case');
   if(currentView==='cases')renderCases();
