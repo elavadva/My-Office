@@ -1792,7 +1792,14 @@ function renderCaseProfile(id) {
   // Meetings
   renderCaseMeetings(c);
   // Tasks
-  const caseTasks = DB.tasks.filter(t => String(t.caseId) === String(id));
+  const caseTasks = DB.tasks.filter(t => String(t.caseId) === String(id)).sort((a,b)=>{
+    // Sort by reminder: closest first, empty/done last
+    if(a.done && !b.done) return 1;
+    if(!a.done && b.done) return -1;
+    const ra = a.reminder || '9999-99-99';
+    const rb = b.reminder || '9999-99-99';
+    return ra.localeCompare(rb);
+  });
   const ctbody = document.getElementById('cp-tasks-tbody');
   ctbody.innerHTML = caseTasks.length ? caseTasks.map(t => `<tr class="${t.done?'task-done':''}">
     <td><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id})" style="accent-color:var(--accent);width:15px;height:15px;"></td>
@@ -2176,9 +2183,11 @@ function saveCase(){
   if(eid){
     const i=DB.cases.findIndex(c=>c.id==eid);
     const existing=DB.cases[i];
-    obj.log = existing.log || [];
-    obj.hearings = existing.hearings || [];
-    DB.cases[i]=obj;
+    // Merge: keep all existing fields, only override form fields
+    DB.cases[i] = Object.assign({}, existing, obj, {
+      log: existing.log || [],
+      hearings: existing.hearings || []
+    });
   }
   else DB.cases.push(obj);
   dbSave();closeModal('case');
