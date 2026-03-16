@@ -1763,8 +1763,9 @@ function renderCaseProfile(id) {
   if(c.referrer)meta.push('📨 '+c.referrer);
   if (c.date) meta.push('📅 נפתח ' + fdate(c.date));
   if(c.updated)meta.push('🔄 עודכן '+fdate(c.updated));
-  if(c.closeDate)meta.push('🔒 נסגר '+fdate(c.closeDate));
   if(c.extraId)meta.push('🔖 '+c.extraId);
+  if(c.closeDate)meta.push('🔒 נסגר '+fdate(c.closeDate));
+  if(c.desc)meta.push('📝 '+c.desc);
   meta.push(statusTag(c.status));
   document.getElementById('cp-meta').innerHTML = meta.map(m => `<span>${m}</span>`).join('');
   document.getElementById('cp-edit-btn').onclick = () => editCase(id);
