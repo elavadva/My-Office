@@ -2200,6 +2200,20 @@ function editCase(id){
   const c=DB.cases.find(x=>x.id==id);if(!c)return;
   fillClientSelect('mcs-client');
   document.getElementById('mcs-title').textContent='✏️ עריכת תיק';
+  // Reset all fields first to avoid leftover values from previous edits
+  document.getElementById('mcs-id').value='';
+  document.getElementById('mcs-name').value='';
+  document.getElementById('mcs-num').value='';
+  document.getElementById('mcs-type').value='';
+  document.getElementById('mcs-status').value='active';
+  document.getElementById('mcs-date').value='';
+  document.getElementById('mcs-court').value='';
+  document.getElementById('mcs-desc').value='';
+  const extraIdEl=document.getElementById('mcs-extra-id');
+  if(extraIdEl) extraIdEl.value='';
+  const closeDateEl=document.getElementById('mcs-close-date');
+  if(closeDateEl) closeDateEl.value='';
+  // Now fill with actual case data
   document.getElementById('mcs-id').value=c.id;
   document.getElementById('mcs-name').value=c.name;
   document.getElementById('mcs-num').value=c.num||'';
@@ -2211,8 +2225,10 @@ function editCase(id){
   document.getElementById('mcs-date').value=c.date||'';
   document.getElementById('mcs-court').value=c.court||'';
   document.getElementById('mcs-desc').value=c.desc||'';
+  if(extraIdEl) extraIdEl.value=c.extraId||'';
+  if(closeDateEl) closeDateEl.value=c.closeDate||'';
   fillReferrerSelect('mcs-referrer');
-  if(c.referrer)document.getElementById('mcs-referrer').value=c.referrer;
+  document.getElementById('mcs-referrer').value=c.referrer||'';
   document.getElementById('modal-case').classList.add('open');
 }
 
